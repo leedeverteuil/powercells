@@ -1,0 +1,68 @@
+---
+import "@/styles/globals.css";
+import Layout from "../layouts/Layout.astro";
+import DarkModeToggle from "@/components/DarkModeToggle";
+import CellsGrid from "@/components/CellsGrid";
+import Footer from "@/components/Footer";
+---
+
+<!-- for dark mode -->
+<script is:inline>
+  const getThemePreference = () => {
+    if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
+      return localStorage.getItem("theme");
+    }
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  };
+  const isDark = getThemePreference() === "dark";
+  document.documentElement.classList[isDark ? "add" : "remove"]("dark");
+
+  if (typeof localStorage !== "undefined") {
+    const observer = new MutationObserver(() => {
+      const isDark = document.documentElement.classList.contains("dark");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  }
+</script>
+
+<Layout title="Welcome to Astro.">
+  <main class="h-screen max-w-full overflow-hidden bg-white dark:bg-zinc-950">
+    <!-- left side -->
+    <section class="">
+      <!-- header -->
+      <header
+        class="flex items-center justify-between p-5 border-b border-colors"
+      >
+        <div class="space-y-0.5">
+          <img
+            src="/logo-light.svg"
+            alt="powercells.js"
+            class="block h-6 dark:hidden"
+          />
+          <img
+            src="/logo-dark.svg"
+            alt="powercells.js"
+            class="hidden h-6 dark:block"
+          />
+          <p class="text-sm text-zinc-500">
+            Spreadsheet empowered with JavaScript
+          </p>
+        </div>
+
+        <DarkModeToggle client:only="react" />
+      </header>
+
+      <!-- cells -->
+      <CellsGrid client:only="react" />
+
+      <!-- fixed footer -->
+      <Footer client:only="react" />
+    </section>
+  </main>
+</Layout>
