@@ -2,8 +2,7 @@
 import "@/styles/globals.css";
 import Layout from "../layouts/Layout.astro";
 import DarkModeToggle from "@/components/DarkModeToggle";
-import CellsGrid from "@/components/CellsGrid";
-import Footer from "@/components/Footer";
+import Spreadsheet from "@/components/Spreadsheet";
 ---
 
 <!-- for dark mode -->
@@ -36,9 +35,7 @@ import Footer from "@/components/Footer";
     <!-- left side -->
     <section class="">
       <!-- header -->
-      <header
-        class="flex items-center justify-between p-5 border-b border-colors"
-      >
+      <header class="flex items-center justify-between p-5 pb-3">
         <div class="space-y-0.5">
           <img
             src="/logo-light.svg"
@@ -58,11 +55,7 @@ import Footer from "@/components/Footer";
         <DarkModeToggle client:only="react" />
       </header>
 
-      <!-- cells -->
-      <CellsGrid client:only="react" />
-
-      <!-- fixed footer -->
-      <Footer client:only="react" />
+      <Spreadsheet client:only="react" />
     </section>
   </main>
 </Layout>

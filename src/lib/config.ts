@@ -1,0 +1,1 @@
+export const TOTAL_NUM_ROWS = 50;

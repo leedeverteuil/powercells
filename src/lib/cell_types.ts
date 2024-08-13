@@ -10,7 +10,7 @@ export type CellValue = string | number | boolean;
 export type CellType = "normal" | "button" | "toggle" | "slider" | "timer";
 
 // shared with public and private
-type BaseCell = {
+export type BaseCell = {
   type: CellType;
   location: CellLocation;
 };
@@ -19,17 +19,22 @@ type BaseCell = {
 export type PrivateCellNormal = BaseCell & {
   type: "normal";
   value: CellValue;
+  dependencies: PrivateCellNormal[];
+  dependents: PrivateCellNormal[];
+  setValue: (value: CellValue) => void;
   format: ((value: CellValue, cell: PublicCell, spreadsheet: PublicSpreadsheet) => string) | null;
   calculate: ((cell: PublicCell, spreadsheet: PublicSpreadsheet) => CellValue) | null;
 }
 
 export type PrivateCellWithButton = BaseCell & {
+  type: "button";
   id: string;
   label: string;
   action: ((spreadsheet: PublicSpreadsheet) => void) | null;
 }
 
 export type PrivateCellWithToggle = BaseCell & {
+  type: "toggle";
   id: string;
   label: string;
   value: boolean;
@@ -37,6 +42,7 @@ export type PrivateCellWithToggle = BaseCell & {
 }
 
 export type PrivateCellWithTimer = BaseCell & {
+  type: "timer";
   id: string;
   label: string;
   loopTimeMs: number;
@@ -48,22 +54,29 @@ export type PrivateCell = PrivateCellNormal | PrivateCellWithButton | PrivateCel
 // public cell types
 export type PublicCellNormal = BaseCell & {
   type: "normal";
+  location: CellLocation;
   getValue: () => CellValue;
   setValue: (value: CellValue) => void;
 }
 
 export type PublicCellWithButton = BaseCell & {
+  type: "button";
+  location: CellLocation;
   id: string;
   label: string;
 }
 
 export type PublicCellWithToggle = BaseCell & {
+  type: "toggle";
+  location: CellLocation;
   id: string;
   label: string;
-  value: boolean;
+  getValue: () => boolean;
 }
 
 export type PublicCellWithTimer = BaseCell & {
+  type: "timer";
+  location: CellLocation;
   id: string;
   label: string;
   loopTimeMs: number;
