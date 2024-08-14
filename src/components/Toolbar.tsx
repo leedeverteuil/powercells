@@ -1,4 +1,4 @@
-import { Ban, Code } from "lucide-react";
+import { Code } from "lucide-react";
 import { Button } from "./ui/button";
 
 const Toolbar = () => {
@@ -7,11 +7,6 @@ const Toolbar = () => {
       {/* open hooks drawer */}
       <Button variant="secondary">
         <Code className="w-4 h-4 mr-2" /> Edit Hooks
-      </Button>
-
-      {/* deselect current cell */}
-      <Button variant="secondary" disabled>
-        <Ban className="w-4 h-4 mr-2" /> Deselect
       </Button>
     </div>
   );

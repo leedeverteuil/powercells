@@ -136,7 +136,7 @@ export class PrivateSpreadsheet {
 
   selectLocation(location: CellLocation | null) {
     // update new location and old location
-    const deps = [];
+    const deps = ["selectedLocation"];
     if (this.selectedLocation) {
       deps.push(getLocationId(this.selectedLocation));
     }

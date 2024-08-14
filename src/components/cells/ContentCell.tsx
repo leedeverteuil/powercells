@@ -1,4 +1,4 @@
-import type { CellLocation, PrivateCell } from "@/lib/cells/cell_types";
+import type { CellLocation } from "@/lib/cells/cell_types";
 import { CellContent } from "./CellContent";
 import { spreadsheet } from "@/lib/spreadsheet";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
@@ -24,14 +24,14 @@ export const ContentCell = ({ location }: Props) => {
   const rowBorderClass = row === 0 ? "border-t-0" : "";
   const colBorderClass = col === 0 ? "border-l-0" : "";
   const selectedClass = selected
-    ? "ring-[3px] ring-lime-300 z-10 rounded-sm border-lime-700 !border-l-[0.5px] !border-t-[0.5px]"
+    ? "ring-[4px] ring-lime-300/50 dark:ring-lime-700/50 z-[1] outline outline-1 outline-lime-500 rounded-sm"
     : "";
 
   return (
     <div
       onClick={onClick}
       className={`p-1 border-[0.5px] ${rowBorderClass} ${colBorderClass} ${selectedClass}
-                border-zinc-200 dark:border-zinc-800 transition-all cursor-pointer`}>
+                border-zinc-200 dark:border-zinc-800 cursor-pointer overflow-x-scroll no-scrollbar`}>
       {/* format and render cell's content based on type etc */}
       <CellContent cell={cell} location={location}></CellContent>
     </div>

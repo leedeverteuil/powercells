@@ -1,4 +1,4 @@
-import type { CellLocation, PrivateCell } from "./cell_types";
+import type { CellLocation, CellValue, PrivateCell } from "./cell_types";
 
 // for converting letters to numbers
 const lettersToNums: { [letter: string]: number } = {
@@ -9,6 +9,14 @@ const lettersToNums: { [letter: string]: number } = {
   y: 24, z: 25
 };
 
+const numsToLetters: { [num: number]: string } = {
+  0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f',
+  6: 'g', 7: 'h', 8: 'i', 9: 'j', 10: 'k', 11: 'l',
+  12: 'm', 13: 'n', 14: 'o', 15: 'p', 16: 'q', 17: 'r',
+  18: 's', 19: 't', 20: 'u', 21: 'v', 22: 'w', 23: 'x',
+  24: 'y', 25: 'z'
+};
+
 // functions
 export function getLocationId(location: CellLocation) {
   return `${location.col}-${location.row}`;
@@ -16,6 +24,10 @@ export function getLocationId(location: CellLocation) {
 
 export function areLocationsEqual(locationA: CellLocation, locationB: CellLocation) {
   return locationA.col === locationB.col && locationA.row === locationB.row;
+}
+
+export function getLocationDisplayName(location: CellLocation) {
+  return `${numsToLetters[location.col]}${location.row}`.toUpperCase();
 }
 
 export function parseCellLocationFromUserInput(col: string | number, row: number): CellLocation {
@@ -54,4 +66,30 @@ export function findCellAtLocation(grid: PrivateCell[][], location: CellLocation
   }
 
   return null;
+}
+
+export function inputToCellValue(input: string): CellValue {
+  // if value is `true` or `false` it's a bool
+  if (input === "true") {
+    return true;
+  }
+  else if (input === "false") {
+    return false;
+  }
+  // valid int
+  else if (input.match(/^-?\d+$/)) {
+    return parseInt(input, 10);
+  }
+  // valid float
+  else if (input.match(/^-?\d*\.\d+$/)) {
+    return parseFloat(input);
+  }
+  // no clue what it is, keep it as string
+  else {
+    return input;
+  }
+}
+
+export function cellValueToString(value: CellValue): string {
+  return value.toString();
 }

@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 import Layout from "../layouts/Layout.astro";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import Spreadsheet from "@/components/Spreadsheet";
+import { CodePanel } from "@/components/code_panel/CodePanel";
 ---
 
 <!-- for dark mode -->
@@ -33,7 +34,7 @@ import Spreadsheet from "@/components/Spreadsheet";
 <Layout title="Welcome to Astro.">
   <main class="h-screen max-w-full overflow-hidden bg-white dark:bg-zinc-950">
     <!-- left side -->
-    <section class="">
+    <section class="overflow-hidden max-w-[calc(100%-25rem)]">
       <!-- header -->
       <header class="flex items-center justify-between p-5 pb-3">
         <div class="space-y-0.5">
@@ -56,6 +57,12 @@ import Spreadsheet from "@/components/Spreadsheet";
       </header>
 
       <Spreadsheet client:only="react" />
+    </section>
+
+    <!-- right side -->
+    <section
+      class="fixed right-0 top-0 w-[25rem] h-full border-l border-colors">
+      <CodePanel client:only="react" />
     </section>
   </main>
 </Layout>

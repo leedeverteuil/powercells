@@ -6,7 +6,7 @@ import { useRenderSubscriber } from "@/lib/render_subscriber";
 
 type Props = {
   cell: PrivateCell | null;
-  location: CellLocation
+  location: CellLocation;
 };
 export const CellContent = ({ cell, location }: Props) => {
   const { col, row } = location;
@@ -32,9 +32,9 @@ export const CellContent = ({ cell, location }: Props) => {
     }
     // no formatter provided
     else {
-      content = <span>{value.toString()}</span>;
+      content = <>{value.toString()}</>;
     }
   }
 
-  return <>{content}</>;
+  return <span className="overflow-hidden truncate">{content}</span>;
 };
