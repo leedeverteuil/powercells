@@ -1,8 +1,14 @@
-import type { CellLocation, PrivateCell, PrivateCellNormal } from "./cell_types";
-import {
-  addBlankCell, findCellAtLocation, getPublicCellFromPrivate,
-  parseCellLocationFromUserInput, recalculateCellWithValueCheck
-} from "./cells";
+import { PrivateCellNormal } from "./cells/cell_normal";
+import type { CellLocation, PrivateCell } from "./cells/cell_types";
+import { getPublicCellFromPrivate, recalculateCellWithValueCheck } from "./cells/cells";
+import { findCellAtLocation, getLocationId, parseCellLocationFromUserInput } from "./cells/cells_util";
+
+// types
+export type SpreadsheetSubscriber = (ts: number) => void;
+export type SpreadsheetSubscriberRecord = {
+  subscriber: SpreadsheetSubscriber;
+  dependencies: string[];
+};
 
 // constants
 export const letters = [
@@ -29,9 +35,10 @@ export class PublicSpreadsheet {
 }
 
 export class PrivateSpreadsheet {
+  selectedLocation: CellLocation | null = null;
   grid: PrivateCell[][] = [];
   publicSpreadsheet: PublicSpreadsheet;
-  renderListener: ((ts: number) => void) | null = null;
+  subscriberRecords: SpreadsheetSubscriberRecord[] = [];
 
   constructor() {
     this.publicSpreadsheet = new PublicSpreadsheet(this);
@@ -46,6 +53,23 @@ export class PrivateSpreadsheet {
     console.log("destroying spreadsheet");
   }
 
+  /** @returns unsubscribe function */
+  subscribe(func: SpreadsheetSubscriber, dependencies: string[]): () => void {
+    // already in arr
+    const exists = this.subscriberRecords.find(s => s.subscriber === func);
+    if (!exists) {
+      this.subscriberRecords.push({
+        subscriber: func,
+        dependencies
+      });
+    }
+
+    // unsub function
+    return () => {
+      this.subscriberRecords = this.subscriberRecords.filter(s => s.subscriber !== func);
+    };
+  }
+
   getCell(location: CellLocation): PrivateCell {
     const existingCell = findCellAtLocation(this.grid, location);
 
@@ -56,7 +80,20 @@ export class PrivateSpreadsheet {
     // no existing cell, but we will create since it is
     // being summoned now
     else {
-      return addBlankCell(this, location);
+      const { row, col } = location;
+      const grid = this.grid;
+
+      // make row if not already made
+      let gridRow = grid[row];
+      if (gridRow === undefined) {
+        grid[row] = [];
+        gridRow = grid[row];
+      }
+
+      const newCell = new PrivateCellNormal(location, "");
+      gridRow[col] = newCell;
+
+      return newCell;
     }
   }
 
@@ -80,6 +117,8 @@ export class PrivateSpreadsheet {
   }
 
   handleCellChange(changedCell: PrivateCellNormal, isFullRecalculate = false): void {
+    this.updateSubscribers([getLocationId(changedCell.location)]);
+
     for (const dep of changedCell.dependents) {
       let didChange = false;
 
@@ -93,10 +132,33 @@ export class PrivateSpreadsheet {
         this.handleCellChange(dep, isFullRecalculate);
       }
     };
+  }
 
-    // for react to re-render
-    if (this.renderListener !== null) {
-      this.renderListener(Date.now());
+  selectLocation(location: CellLocation | null) {
+    // update new location and old location
+    const deps = [];
+    if (this.selectedLocation) {
+      deps.push(getLocationId(this.selectedLocation));
+    }
+
+    if (location) {
+      deps.push(getLocationId(location));
+    }
+
+    this.selectedLocation = location;
+    this.updateSubscribers(deps);
+  }
+
+  private updateSubscribers(dependencies: string[]) {
+    const ts = Date.now();
+
+    // look for subscribers matching any of those dependencies and fire them
+    for (const record of this.subscriberRecords) {
+      const recordDeps = record.dependencies;
+      if (dependencies.find(d => recordDeps.includes(d)) !== undefined) {
+        try { record.subscriber(ts); }
+        catch (err) { console.warn(err); }
+      }
     }
   }
 }
