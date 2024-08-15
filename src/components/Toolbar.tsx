@@ -1,4 +1,4 @@
-import { Code, RefreshCcw } from "lucide-react";
+import { Code, Play } from "lucide-react";
 import { Button } from "./ui/button";
 import { spreadsheet } from "@/lib/spreadsheet";
 import { useState } from "react";
@@ -18,7 +18,7 @@ const Toolbar = () => {
     <div className="flex items-center justify-start gap-2 px-5 pb-4 border-b border-colors">
       {/* recalculate all */}
       <Button disabled={isRecalculating} onClick={recalculateAll} variant="secondary">
-        <RefreshCcw className="w-4 h-4 mr-2" /> Recalculate All
+        <Play className="w-4 h-4 mr-2" /> Recalculate All
       </Button>
 
       {/* open hooks drawer */}

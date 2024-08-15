@@ -1,9 +1,7 @@
-import type {
-  PrivateCellNormal,
-} from "@/lib/cells/cell_normal";
+import type { PrivateCellNormal } from "@/lib/cells/cell_normal";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { Play, Plus, Trash2 } from "lucide-react";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
 import { getLocationId } from "@/lib/cells/cells_util";
 import { useEffect, useState } from "react";
@@ -53,6 +51,10 @@ export const CalculateFunction = ({ cell }: Props) => {
     cell.runCalculate();
   };
 
+  const handleRun = () => {
+    cell.runCalculate();
+  };
+
   return (
     <>
       {hasCalculate ? (
@@ -64,13 +66,23 @@ export const CalculateFunction = ({ cell }: Props) => {
             onInput={onInput}></CodeTextArea>
 
           <div className="flex items-center justify-center gap-1.5">
-            <Button
-              onClick={saveChanges}
-              variant="secondary"
-              disabled={!isFuncDifferent}
-              className="w-full">
-              Save changes
-            </Button>
+            {isFuncDifferent ? (
+              <Button
+                onClick={saveChanges}
+                variant="secondary"
+                disabled={!isFuncDifferent}
+                className="w-full">
+                Save changes
+              </Button>
+            ) : (
+              <Button
+                onClick={handleRun}
+                variant="secondary"
+                className="w-full">
+                <Play className="w-4 h-4 mr-1.5" />
+                Run
+              </Button>
+            )}
 
             <Button variant="ghost" className="w-full">
               <Trash2 className="w-4 h-4 mr-1.5" />
@@ -81,7 +93,10 @@ export const CalculateFunction = ({ cell }: Props) => {
       ) : (
         <div className="flex flex-col gap-1.5">
           <Label>Calculate</Label>
-          <Button onClick={addCalculateFunc} className="w-fit">
+          <Button
+            variant="secondary"
+            onClick={addCalculateFunc}
+            className="w-fit">
             <Plus className="w-4 h-4 mr-1" />
             Add Calculate Function
           </Button>
