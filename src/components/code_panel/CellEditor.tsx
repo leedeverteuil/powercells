@@ -11,6 +11,7 @@ import { CellTypeSelect } from "./CellTypeSelect";
 import { CellValueInput } from "./CellValueInput";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
 import { CalculateFunction } from "./CalculateFunction";
+import { CellDependencies } from "./CellDependencies";
 
 type Props = {
   location: CellLocation;
@@ -54,6 +55,9 @@ export const CellEditor = ({ location }: Props) => {
 
         {/* calculate function */}
         <CalculateFunction cell={cell} />
+
+        {/* dependencies */}
+        <CellDependencies cell={cell}></CellDependencies>
 
         {/* format function */}
       </div>
