@@ -20,15 +20,15 @@ export const CellContent = ({ cell, location }: Props) => {
 
     // user wrote a formatter
     if (format) {
-      content = (
-        <>
-          {format(
-            value,
-            getPublicCellFromPrivate(cell),
-            spreadsheet.publicSpreadsheet
-          )}
-        </>
-      );
+       // content = (
+      //   <>
+      //     {format(
+      //       value,
+      //       getPublicCellFromPrivate(cell),
+      //       spreadsheet.publicSpreadsheet
+      //     )}
+      //   </>
+      // );
     }
     // no formatter provided
     else {

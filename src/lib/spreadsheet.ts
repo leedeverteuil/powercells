@@ -25,7 +25,7 @@ export class PublicSpreadsheet {
     this.dependentCell = dependentCell;
   }
 
-  public getCellValue(col: string | number, row: number): CellValue {
+  public getCell(col: string | number, row: number): CellValue {
     const location = parseCellLocationFromUserInput(col, row)
     const cell = this.privateSpreadsheet.getCell(location);
 
@@ -37,7 +37,7 @@ export class PublicSpreadsheet {
     return cell.value;
   }
 
-  public setCellValue(col: string | number, row: number, value: CellValue) {
+  public setCell(col: string | number, row: number, value: CellValue) {
     const location = parseCellLocationFromUserInput(col, row)
     const cell = this.privateSpreadsheet.getCell(location);
     cell.setValue(value);
@@ -128,7 +128,7 @@ export class PrivateSpreadsheet {
     }
   }
 
-  handleCellChange(changedCell: PrivateCellNormal): void {
+  handleCellChange(changedCell: PrivateCellNormal, updateChain: string[] = []): void {
     this.updateSubscribers([getLocationId(changedCell.location)]);
 
     // any cells that depend on changed cell should recalculate
@@ -136,7 +136,7 @@ export class PrivateSpreadsheet {
       if (Array.isArray(row)) {
         for (const cell of row) {
           if (cell && cell.type === "normal" && cell.dependencies.includes(changedCell)) {
-            cell.runCalculate();
+            cell.runCalculate(true, updateChain);
           }
         }
       }

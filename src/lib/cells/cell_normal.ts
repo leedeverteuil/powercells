@@ -1,7 +1,7 @@
 import type { CellLocation, CellValue } from "./cell_types";
 import { PublicSpreadsheet, spreadsheet } from "../spreadsheet";
 import { BaseCell } from "./cell_base";
-import { getPublicCellFromPrivate } from "./cells";
+import { getLocationId } from "./cells_util";
 
 export class PublicCellNormal extends BaseCell {
   private cell: PrivateCellNormal;
@@ -25,7 +25,6 @@ export type UserCalculateFunction = ((currentValue: CellValue, spreadsheet: Publ
 
 export class PrivateCellNormal extends BaseCell {
   dependencies: PrivateCellNormal[] = [];
-  dependents: PrivateCellNormal[] = [];
   value: CellValue;
   format: UserFormatFunction | null = null;
   calculate: UserCalculateFunction | null = null;
@@ -55,11 +54,22 @@ export class PrivateCellNormal extends BaseCell {
 
   setCalculateFunction(func: UserCalculateFunction) {
     this.calculate = func;
-    this.dependencies = []; // reset dependencies
     this.runCalculate()
   }
 
-  runCalculate(updateDependents: boolean = true) {
+  runCalculate(updateDependents: boolean = true, updateChain: string[] = []) {
+    // check update chain to see if already ran
+    const locationId = getLocationId(this.location);
+
+    console.log(locationId, JSON.stringify(updateChain));
+
+    if (updateChain.includes(locationId)) {
+      throw new Error("Circular dependency chain stopped... Todo console display");
+    }
+    else {
+      updateChain.push(locationId);
+    }
+
     // new deps will be determined during run
     this.clearDependencies();
 
@@ -74,12 +84,12 @@ export class PrivateCellNormal extends BaseCell {
       // todo inform user of error they made
     }
 
-    this.setValue(calculatedValue ?? "");
+    this.value = calculatedValue ?? "";
 
     // update dependents if changed
     const changed = oldValue !== calculatedValue;
     if (changed && updateDependents) {
-      spreadsheet.handleCellChange(this);
+      spreadsheet.handleCellChange(this, updateChain);
     }
   }
 }
