@@ -1,5 +1,8 @@
 import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
+import type { CellLocation, PublicCell } from './cells/cell_types';
+import type { UserCalculateFunction } from './cells/cell_normal';
+import type { PublicSpreadsheet } from './spreadsheet';
 
 const ampRegex = new RegExp("&", "g");
 const leftBracketRegex = new RegExp("<", "g");
@@ -28,13 +31,17 @@ export function preventTabbingOut(e: React.KeyboardEvent<HTMLTextAreaElement>): 
 export function getFunctionBody(func: Function | null) {
   const funcStr = func?.toString() ?? ""
 
-  // remove top two lines
+  // remove top two lines and last line
   let lines = funcStr.split("\n");
   lines = lines.filter((_, i) => {
     return i !== 0 && i !== 1 && i !== lines.length - 1;
   });
 
   return lines.join("\n");
+}
+
+export function buildCalculateFunction(funcStr: string): UserCalculateFunction {
+  return Function("cell", "spreadsheet", funcStr) as UserCalculateFunction;
 }
 
 export function cleanCodeForInnerHTML(code: string) {
@@ -47,4 +54,3 @@ export function cleanCodeForInnerHTML(code: string) {
 
   return code;
 }
-

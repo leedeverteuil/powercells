@@ -1,6 +1,6 @@
 import { PrivateCellNormal } from "./cells/cell_normal";
 import type { CellLocation, PrivateCell } from "./cells/cell_types";
-import { getPublicCellFromPrivate, recalculateCellWithValueCheck } from "./cells/cells";
+import { getPublicCellFromPrivate } from "./cells/cells";
 import { findCellAtLocation, getLocationId, parseCellLocationFromUserInput } from "./cells/cells_util";
 
 // types
@@ -19,9 +19,11 @@ export const letters = [
 
 export class PublicSpreadsheet {
   private privateSpreadsheet: PrivateSpreadsheet;
+  private dependentCell: PrivateCellNormal | null = null;
 
-  constructor(privateSpreadsheet: PrivateSpreadsheet) {
+  constructor(privateSpreadsheet: PrivateSpreadsheet, dependentCell: PrivateCellNormal | null = null) {
     this.privateSpreadsheet = privateSpreadsheet;
+    this.dependentCell = dependentCell;
   }
 
   public getCell(col: string | number, row: number) {
@@ -30,6 +32,12 @@ export class PublicSpreadsheet {
 
     // look for existing private cell, if not then make it, add it to rows at appropriate space
     const cell = this.privateSpreadsheet.getCell(location);
+
+    // retrieved cell is now a dependency
+    if (this.dependentCell) {
+      this.dependentCell.addDependency(cell);
+    }
+
     return getPublicCellFromPrivate(cell);
   }
 }
@@ -51,6 +59,13 @@ export class PrivateSpreadsheet {
   destroy() {
     // todo
     console.log("destroying spreadsheet");
+  }
+
+  getPublicSpreadsheet(dependentCell?: PrivateCellNormal): PublicSpreadsheet {
+    // anytime the dependent cell uses public spreadsheet's getCell()
+    // it will add that cell retrieved from getCell
+    // to the depending cell's dependencies
+    return new PublicSpreadsheet(this, dependentCell);
   }
 
   /** @returns unsubscribe function */
@@ -101,37 +116,29 @@ export class PrivateSpreadsheet {
     for (const row of this.grid) {
       if (Array.isArray(row)) {
         for (const cell of row) {
-          // if cell is normal and has no dependencies
-          if (cell.type === "normal" && cell.dependencies.length === 0) {
-            // run user calculate hook
-            if (cell.calculate !== null) {
-              recalculateCellWithValueCheck(cell, this.publicSpreadsheet);
-            }
-
-            // alert dependents of this cell now
-            this.handleCellChange(cell, true);
+          if (cell.type === "normal") {
+            // tell runCalculate to not update dependencies.
+            // we're updating every cell.
+            cell.runCalculate(false);
           }
         }
       }
     }
   }
 
-  handleCellChange(changedCell: PrivateCellNormal, isFullRecalculate = false): void {
+  handleCellChange(changedCell: PrivateCellNormal): void {
     this.updateSubscribers([getLocationId(changedCell.location)]);
 
-    for (const dep of changedCell.dependents) {
-      let didChange = false;
-
-      // run user calculate hook
-      if (dep.calculate !== null) {
-        didChange = recalculateCellWithValueCheck(dep, this.publicSpreadsheet!);
+    // any cells that depend on changed cell should recalculate
+    for (const row of spreadsheet.grid) {
+      if (Array.isArray(row)) {
+        for (const cell of row) {
+          if (cell && cell.type === "normal" && cell.dependencies.includes(changedCell)) {
+            cell.runCalculate();
+          }
+        }
       }
-
-      // alert dependents of this cell now
-      if (didChange || isFullRecalculate) {
-        this.handleCellChange(dep, isFullRecalculate);
-      }
-    };
+    }
   }
 
   selectLocation(location: CellLocation | null) {

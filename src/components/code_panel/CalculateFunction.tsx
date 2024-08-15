@@ -9,7 +9,7 @@ import { useRenderSubscriber } from "@/lib/render_subscriber";
 import { getLocationId } from "@/lib/cells/cells_util";
 import { useEffect, useState } from "react";
 import { CodeTextArea } from "./CodeTextArea";
-import { getFunctionBody } from "@/lib/code_editor";
+import { buildCalculateFunction, getFunctionBody } from "@/lib/code_editor";
 
 type Props = {
   cell: PrivateCellNormal;
@@ -39,9 +39,7 @@ export const CalculateFunction = ({ cell }: Props) => {
   const isFuncDifferent = inputFuncStr !== funcStr;
 
   const addCalculateFunc = () => {
-    cell.setCalculateFunction(
-      Function(exampleFunctionString) as UserCalculateFunction
-    );
+    cell.setCalculateFunction(buildCalculateFunction(exampleFunctionString));
   };
 
   const onInput = (value: string) => {
@@ -49,9 +47,11 @@ export const CalculateFunction = ({ cell }: Props) => {
   };
 
   const saveChanges = () => {
-    // parse code
     // save to cell
-    // re-calculate this cell (must be awaited)
+    cell.setCalculateFunction(buildCalculateFunction(inputFuncStr));
+
+    // re-calculate this cell
+    cell.runCalculate();
   };
 
   return (
