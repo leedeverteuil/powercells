@@ -1,6 +1,5 @@
 import { PrivateCellNormal } from "./cells/cell_normal";
-import type { CellLocation, PrivateCell } from "./cells/cell_types";
-import { getPublicCellFromPrivate } from "./cells/cells";
+import type { CellLocation, CellValue, PrivateCell } from "./cells/cell_types";
 import { findCellAtLocation, getLocationId, parseCellLocationFromUserInput } from "./cells/cells_util";
 
 // types
@@ -26,11 +25,8 @@ export class PublicSpreadsheet {
     this.dependentCell = dependentCell;
   }
 
-  public getCell(col: string | number, row: number) {
-    // parse user inputs for location
+  public getCellValue(col: string | number, row: number): CellValue {
     const location = parseCellLocationFromUserInput(col, row)
-
-    // look for existing private cell, if not then make it, add it to rows at appropriate space
     const cell = this.privateSpreadsheet.getCell(location);
 
     // retrieved cell is now a dependency
@@ -38,7 +34,13 @@ export class PublicSpreadsheet {
       this.dependentCell.addDependency(cell);
     }
 
-    return getPublicCellFromPrivate(cell);
+    return cell.value;
+  }
+
+  public setCellValue(col: string | number, row: number, value: CellValue) {
+    const location = parseCellLocationFromUserInput(col, row)
+    const cell = this.privateSpreadsheet.getCell(location);
+    cell.setValue(value);
   }
 }
 

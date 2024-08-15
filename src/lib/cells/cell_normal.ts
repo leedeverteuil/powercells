@@ -1,4 +1,4 @@
-import type { CellLocation, CellValue, PublicCell } from "./cell_types";
+import type { CellLocation, CellValue } from "./cell_types";
 import { PublicSpreadsheet, spreadsheet } from "../spreadsheet";
 import { BaseCell } from "./cell_base";
 import { getPublicCellFromPrivate } from "./cells";
@@ -20,8 +20,8 @@ export class PublicCellNormal extends BaseCell {
   }
 }
 
-export type UserFormatFunction = ((value: CellValue, cell: PublicCell, spreadsheet: PublicSpreadsheet) => string);
-export type UserCalculateFunction = ((cell: PublicCell, spreadsheet: PublicSpreadsheet) => CellValue);
+export type UserFormatFunction = ((currentValue: CellValue) => string);
+export type UserCalculateFunction = ((currentValue: CellValue, spreadsheet: PublicSpreadsheet) => CellValue);
 
 export class PrivateCellNormal extends BaseCell {
   dependencies: PrivateCellNormal[] = [];
@@ -56,7 +56,7 @@ export class PrivateCellNormal extends BaseCell {
   setCalculateFunction(func: UserCalculateFunction) {
     this.calculate = func;
     this.dependencies = []; // reset dependencies
-    spreadsheet.handleCellChange(this);
+    this.runCalculate()
   }
 
   runCalculate(updateDependents: boolean = true) {
@@ -64,12 +64,10 @@ export class PrivateCellNormal extends BaseCell {
     this.clearDependencies();
 
     const oldValue = this.value;
-    const publicCell = getPublicCellFromPrivate(this);
-
     let calculatedValue: CellValue | null = null;
 
     try {
-      calculatedValue = this.calculate!(publicCell, spreadsheet.getPublicSpreadsheet(this));
+      calculatedValue = this.calculate!(oldValue, spreadsheet.getPublicSpreadsheet(this));
     }
     catch (err) {
       console.error(err);

@@ -1,6 +1,5 @@
 import type {
   PrivateCellNormal,
-  UserCalculateFunction,
 } from "@/lib/cells/cell_normal";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
@@ -15,7 +14,7 @@ type Props = {
   cell: PrivateCellNormal;
 };
 
-const exampleFunctionString = `return cell.getValue() + 5;`;
+const exampleFunctionString = `return currentValue + 5;`;
 
 export const CalculateFunction = ({ cell }: Props) => {
   const [funcStr, setFuncStr] = useState("");

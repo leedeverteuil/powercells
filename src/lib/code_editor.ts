@@ -41,7 +41,7 @@ export function getFunctionBody(func: Function | null) {
 }
 
 export function buildCalculateFunction(funcStr: string): UserCalculateFunction {
-  return Function("cell", "spreadsheet", funcStr) as UserCalculateFunction;
+  return Function("currentValue", "spreadsheet", funcStr) as UserCalculateFunction;
 }
 
 export function cleanCodeForInnerHTML(code: string) {
