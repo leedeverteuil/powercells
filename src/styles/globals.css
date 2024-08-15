@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -88,6 +88,54 @@
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* code theme */
+.hljs {
+  @apply bg-transparent text-zinc-50;
+}
+
+.hljs-comment,
+.hljs-quote {
+  @apply text-zinc-600 italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-name {
+  @apply text-lime-300;
+}
+
+.hljs-attribute,
+.hljs-meta {
+  @apply text-lime-300;
+}
+
+.hljs-number,
+.hljs-regexp,
+.hljs-link {
+  @apply text-pink-400;
+}
+
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-subst {
+  @apply text-pink-400;
+}
+
+.hljs-title,
+.hljs-section {
+  @apply text-purple-300;
+}
+
+.hljs-emphasis {
+  @apply italic;
+}
+
+.hljs-strong {
+  @apply font-semibold;
 }

@@ -10,6 +10,7 @@ import { spreadsheet } from "@/lib/spreadsheet";
 import { CellTypeSelect } from "./CellTypeSelect";
 import { CellValueInput } from "./CellValueInput";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
+import { CalculateFunction } from "./CalculateFunction";
 
 type Props = {
   location: CellLocation;
@@ -52,6 +53,7 @@ export const CellEditor = ({ location }: Props) => {
           onInput={(value) => cell.setValue(value)}></CellValueInput>
 
         {/* calculate function */}
+        <CalculateFunction cell={cell} />
 
         {/* format function */}
       </div>

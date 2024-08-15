@@ -41,4 +41,9 @@ export class PrivateCellNormal extends BaseCell {
     this.value = value;
     spreadsheet.handleCellChange(this, false);
   }
+
+  setCalculateFunction(func: UserCalculateFunction) {
+    this.calculate = func;
+    spreadsheet.handleCellChange(this, false);
+  }
 }

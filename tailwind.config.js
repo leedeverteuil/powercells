@@ -21,6 +21,7 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['"Rubik"', ...defaultTheme.fontFamily.sans],
+        mono: ['"Space Mono"', ...defaultTheme.fontFamily.mono],
       },
       colors: {
         border: "hsl(var(--border))",

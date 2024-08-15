@@ -21,7 +21,6 @@ export const ContentCell = ({ location }: Props) => {
   };
 
   // tailwind
-  const rowBorderClass = row === 0 ? "border-t-0" : "";
   const colBorderClass = col === 0 ? "border-l-0" : "";
   const selectedClass = selected
     ? "ring-[4px] ring-lime-300/50 dark:ring-lime-700/50 z-[1] outline outline-1 outline-lime-500 rounded-sm"
@@ -30,7 +29,7 @@ export const ContentCell = ({ location }: Props) => {
   return (
     <div
       onClick={onClick}
-      className={`p-1 border-[0.5px] ${rowBorderClass} ${colBorderClass} ${selectedClass}
+      className={`p-1 border-[0.5px] ${colBorderClass} ${selectedClass}
                 border-zinc-200 dark:border-zinc-800 cursor-pointer overflow-x-scroll no-scrollbar`}>
       {/* format and render cell's content based on type etc */}
       <CellContent cell={cell} location={location}></CellContent>
