@@ -57,6 +57,10 @@ export class PrivateCellNormal extends BaseCell {
     if (func) {
       this.runCalculate()
     }
+    else {
+      this.dependencies = [];
+      spreadsheet.handleCellChange(this);
+    }
   }
 
   runCalculate(updateDependents: boolean = true, updateChain: string[] = []) {

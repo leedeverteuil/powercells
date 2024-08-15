@@ -3,7 +3,6 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { inputToCellValue } from "@/lib/cells/cells_util";
 import { Badge } from "../ui/badge";
-import { useEffect, useRef } from "react";
 
 type Props = {
   value: string;

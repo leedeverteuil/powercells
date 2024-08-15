@@ -1,13 +1,16 @@
 import type { PrivateCellNormal } from "@/lib/cells/cell_normal";
 import { Label } from "../ui/label";
 import { Badge } from "../ui/badge";
-import { getLocationDisplayName } from "@/lib/cells/cells_util";
+import { getLocationDisplayName, getLocationId } from "@/lib/cells/cells_util";
+import { useRenderSubscriber } from "@/lib/render_subscriber";
 
 type Props = {
   cell: PrivateCellNormal;
 };
 
 export const CellDependencies = ({ cell }: Props) => {
+  // useRenderSubscriber([getLocationId(cell.location)]);
+
   const deps = cell.dependencies;
   return (
     <div>
