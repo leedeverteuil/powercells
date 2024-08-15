@@ -7,6 +7,7 @@ import { getLocationId } from "@/lib/cells/cells_util";
 import { useEffect, useState } from "react";
 import { CodeTextArea } from "./CodeTextArea";
 import { buildCalculateFunction, getFunctionBody } from "@/lib/code_editor";
+import { DeleteFunctionDialog } from "./DeleteFunctionDialog";
 
 type Props = {
   cell: PrivateCellNormal;
@@ -15,6 +16,7 @@ type Props = {
 const exampleFunctionString = `return currentValue + 5;`;
 
 export const CalculateFunction = ({ cell }: Props) => {
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [funcStr, setFuncStr] = useState("");
   const [inputFuncStr, setInputFuncStr] = useState("");
   const renderTs = useRenderSubscriber([getLocationId(cell.location)]);
@@ -55,6 +57,15 @@ export const CalculateFunction = ({ cell }: Props) => {
     cell.runCalculate();
   };
 
+  const openDeleteDialog = () => {
+    setDeleteOpen(true);
+  };
+
+  const confirmDelete = () => {
+    cell.setCalculateFunction(null);
+    setDeleteOpen(false);
+  };
+
   return (
     <>
       {hasCalculate ? (
@@ -84,7 +95,10 @@ export const CalculateFunction = ({ cell }: Props) => {
               </Button>
             )}
 
-            <Button variant="ghost" className="w-full">
+            <Button
+              onClick={openDeleteDialog}
+              variant="ghost"
+              className="w-full">
               <Trash2 className="w-4 h-4 mr-1.5" />
               Delete
             </Button>
@@ -102,6 +116,12 @@ export const CalculateFunction = ({ cell }: Props) => {
           </Button>
         </div>
       )}
+
+      <DeleteFunctionDialog
+        title="Delete Calculate function?"
+        open={deleteOpen}
+        onConfirm={confirmDelete}
+        onClose={() => setDeleteOpen(false)}></DeleteFunctionDialog>
     </>
   );
 };

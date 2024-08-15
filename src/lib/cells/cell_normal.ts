@@ -52,9 +52,11 @@ export class PrivateCellNormal extends BaseCell {
     this.dependencies = [];
   }
 
-  setCalculateFunction(func: UserCalculateFunction) {
+  setCalculateFunction(func: UserCalculateFunction | null) {
     this.calculate = func;
-    this.runCalculate()
+    if (func) {
+      this.runCalculate()
+    }
   }
 
   runCalculate(updateDependents: boolean = true, updateChain: string[] = []) {
