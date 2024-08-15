@@ -58,11 +58,11 @@ export class PrivateCellNormal extends BaseCell {
   }
 
   runCalculate(updateDependents: boolean = true, updateChain: string[] = []) {
+    // no calculate function
+    if (!this.calculate) return;
+
     // check update chain to see if already ran
     const locationId = getLocationId(this.location);
-
-    console.log(locationId, JSON.stringify(updateChain));
-
     if (updateChain.includes(locationId)) {
       throw new Error("Circular dependency chain stopped... Todo console display");
     }

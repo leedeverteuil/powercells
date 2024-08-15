@@ -1,6 +1,6 @@
 import { PrivateCellNormal } from "./cells/cell_normal";
 import type { CellLocation, CellValue, PrivateCell } from "./cells/cell_types";
-import { findCellAtLocation, getLocationId, parseCellLocationFromUserInput } from "./cells/cells_util";
+import { areLocationsEqual, findCellAtLocation, getLocationId, parseCellLocationFromUserInput } from "./cells/cells_util";
 
 // types
 export type SpreadsheetSubscriber = (ts: number) => void;
@@ -118,10 +118,11 @@ export class PrivateSpreadsheet {
     for (const row of this.grid) {
       if (Array.isArray(row)) {
         for (const cell of row) {
-          if (cell.type === "normal") {
+          if (cell && cell.type === "normal") {
             // tell runCalculate to not update dependencies.
             // we're updating every cell.
             cell.runCalculate(false);
+            this.updateSubscribers([getLocationId(cell.location)]);
           }
         }
       }
