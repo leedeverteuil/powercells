@@ -12,6 +12,7 @@ import { CellValueInput } from "./CellValueInput";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
 import { CalculateFunction } from "./CalculateFunction";
 import { CellDependencies } from "./CellDependencies";
+import { FormatFunction } from "./FormatFunction";
 
 type Props = {
   location: CellLocation;
@@ -25,7 +26,7 @@ export const CellEditor = ({ location }: Props) => {
 
   return (
     // selected location
-    <div className="">
+    <div className="h-full pb-20 overflow-y-auto">
       <div className="flex items-center justify-between px-5 py-3 border-b">
         {/* cell location info */}
         <h3 className="text-xl font-semibold tracking-tight">
@@ -60,6 +61,7 @@ export const CellEditor = ({ location }: Props) => {
         <CellDependencies cell={cell}></CellDependencies>
 
         {/* format function */}
+        <FormatFunction cell={cell}></FormatFunction>
       </div>
     </div>
   );

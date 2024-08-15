@@ -1,7 +1,5 @@
-import { getPublicCellFromPrivate } from "@/lib/cells/cells";
 import type { CellLocation, PrivateCell } from "@/lib/cells/cell_types";
 import type { ReactElement } from "react";
-import { spreadsheet } from "@/lib/spreadsheet";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
 
 type Props = {
@@ -20,15 +18,7 @@ export const CellContent = ({ cell, location }: Props) => {
 
     // user wrote a formatter
     if (format) {
-       // content = (
-      //   <>
-      //     {format(
-      //       value,
-      //       getPublicCellFromPrivate(cell),
-      //       spreadsheet.publicSpreadsheet
-      //     )}
-      //   </>
-      // );
+      content = <>{format(value)}</>;
     }
     // no formatter provided
     else {

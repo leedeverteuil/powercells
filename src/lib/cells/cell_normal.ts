@@ -63,6 +63,11 @@ export class PrivateCellNormal extends BaseCell {
     }
   }
 
+  setFormatFunction(func: UserFormatFunction | null) {
+    this.format = func;
+    spreadsheet.handleCellChange(this);
+  }
+
   runCalculate(updateDependents: boolean = true, updateChain: string[] = []) {
     // no calculate function
     if (!this.calculate) return;
