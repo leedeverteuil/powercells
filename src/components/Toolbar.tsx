@@ -6,10 +6,10 @@ import { useState } from "react";
 const Toolbar = () => {
   const [isRecalculating, setIsRecalculating] = useState(false);
 
-  const recalculateAll = () => {
+  const recalculateAll = async () => {
     if (!isRecalculating) {
       setIsRecalculating(true);
-      spreadsheet.recalculate();
+      await spreadsheet.recalculate();
       setIsRecalculating(false);
     }
   };

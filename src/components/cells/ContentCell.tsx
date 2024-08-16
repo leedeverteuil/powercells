@@ -2,19 +2,23 @@ import type { CellLocation } from "@/lib/cells/cell_types";
 import { CellContent } from "./CellContent";
 import { spreadsheet } from "@/lib/spreadsheet";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
-import { areLocationsEqual, findCellAtLocation } from "@/lib/cells/cells_util";
+import {
+  areLocationsEqual,
+  findCellAtLocation,
+  getLocationId,
+} from "@/lib/cells/cells_util";
 
 type Props = {
   location: CellLocation;
 };
 export const ContentCell = ({ location }: Props) => {
   const cell = findCellAtLocation(spreadsheet.grid, location);
-  const { col, row } = location;
+  const { col } = location;
   const selected =
     spreadsheet.selectedLocation &&
     areLocationsEqual(location, spreadsheet.selectedLocation);
 
-  useRenderSubscriber([`${col}-${row}`]);
+  useRenderSubscriber([getLocationId(location)], true, cell);
 
   const onClick = () => {
     spreadsheet.selectLocation(location);

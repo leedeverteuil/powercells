@@ -1,6 +1,6 @@
 import { PrivateCellNormal } from "./cells/cell_normal";
 import type { CellLocation, CellValue, PrivateCell } from "./cells/cell_types";
-import { areLocationsEqual, findCellAtLocation, getLocationId, parseCellLocationFromUserInput } from "./cells/cells_util";
+import { findCellAtLocation, getLocationId, parseCellLocationFromUserInput } from "./cells/cells_util";
 
 // types
 export type SpreadsheetSubscriber = (ts: number) => void;
@@ -55,7 +55,7 @@ export class PrivateSpreadsheet {
   }
 
   init() {
-    this.recalculate();
+    this.recalculate().then().catch(console.error);
   }
 
   destroy() {
@@ -114,14 +114,14 @@ export class PrivateSpreadsheet {
     }
   }
 
-  recalculate() {
+  async recalculate() {
     for (const row of this.grid) {
       if (Array.isArray(row)) {
         for (const cell of row) {
           if (cell && cell.type === "normal") {
             // tell runCalculate to not update dependencies.
             // we're updating every cell.
-            cell.runCalculate(false);
+            await cell.runCalculate(false);
             this.updateSubscribers([getLocationId(cell.location)]);
           }
         }
@@ -129,15 +129,23 @@ export class PrivateSpreadsheet {
     }
   }
 
-  handleCellChange(changedCell: PrivateCellNormal, updateChain: string[] = []): void {
-    this.updateSubscribers([getLocationId(changedCell.location)]);
+  handleCellChangeAsync(changedCell: PrivateCellNormal) {
+    this.handleCellChange(changedCell, [])
+      .then()
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  async handleCellChange(changedCell: PrivateCellNormal, updateChain: string[] = []) {
+    this.updateSubscribers([getLocationId(changedCell.location), "grid"]);
 
     // any cells that depend on changed cell should recalculate
     for (const row of spreadsheet.grid) {
       if (Array.isArray(row)) {
         for (const cell of row) {
           if (cell && cell.type === "normal" && cell.dependencies.includes(changedCell)) {
-            cell.runCalculate(true, updateChain);
+            await cell.runCalculate(true, updateChain);
           }
         }
       }
@@ -146,7 +154,7 @@ export class PrivateSpreadsheet {
 
   selectLocation(location: CellLocation | null) {
     // update new location and old location
-    const deps = ["selectedLocation"];
+    const deps = ["selectedLocation", "grid"];
     if (this.selectedLocation) {
       deps.push(getLocationId(this.selectedLocation));
     }

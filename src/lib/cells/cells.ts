@@ -1,27 +1,5 @@
-import type { PrivateSpreadsheet, PublicSpreadsheet } from "../spreadsheet";
-import { PrivateCellNormal, PublicCellNormal } from "./cell_normal";
-import type { CellLocation, PrivateCell, PublicCell } from "./cell_types";
-
-/** @returns `true` if value changed after recalculation */
-export function recalculateCellWithValueCheck(cell: PrivateCellNormal, publicSpreadsheet: PublicSpreadsheet): boolean {
-  const oldValue = cell.value;
-  const publicCell = getPublicCellFromPrivate(cell);
-
-  try {
-    const calculatedValue = cell.calculate!(publicCell, publicSpreadsheet);
-
-    // todo validate calculated value
-
-    cell.setValue(calculatedValue);
-
-    return oldValue !== calculatedValue;
-  }
-  catch (err) {
-    console.error(err);
-    // todo inform user of error they made
-    throw err;
-  }
-}
+import { PublicCellNormal } from "./cell_normal";
+import type { PrivateCell, PublicCell } from "./cell_types";
 
 export function getPublicCellFromPrivate(privateCell: PrivateCell): PublicCell {
   const { type, location } = privateCell;

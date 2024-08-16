@@ -21,7 +21,7 @@ export class PublicCellNormal extends BaseCell {
 }
 
 export type UserFormatFunction = ((currentValue: CellValue) => string);
-export type UserCalculateFunction = ((currentValue: CellValue, spreadsheet: PublicSpreadsheet) => CellValue);
+export type UserCalculateFunction = ((currentValue: CellValue, spreadsheet: PublicSpreadsheet) => Promise<CellValue>);
 
 export class PrivateCellNormal extends BaseCell {
   dependencies: PrivateCellNormal[] = [];
@@ -39,7 +39,7 @@ export class PrivateCellNormal extends BaseCell {
 
   setValue(value: CellValue) {
     this.value = value;
-    spreadsheet.handleCellChange(this);
+    spreadsheet.handleCellChangeAsync(this);
   }
 
   addDependency(cell: PrivateCellNormal) {
@@ -59,16 +59,16 @@ export class PrivateCellNormal extends BaseCell {
     }
     else {
       this.dependencies = [];
-      spreadsheet.handleCellChange(this);
+      spreadsheet.handleCellChangeAsync(this);
     }
   }
 
   setFormatFunction(func: UserFormatFunction | null) {
     this.format = func;
-    spreadsheet.handleCellChange(this);
+    spreadsheet.handleCellChangeAsync(this);
   }
 
-  runCalculate(updateDependents: boolean = true, updateChain: string[] = []) {
+  async runCalculate(updateDependents: boolean = true, updateChain: string[] = []) {
     // no calculate function
     if (!this.calculate) return;
 
@@ -88,7 +88,7 @@ export class PrivateCellNormal extends BaseCell {
     let calculatedValue: CellValue | null = null;
 
     try {
-      calculatedValue = this.calculate!(oldValue, spreadsheet.getPublicSpreadsheet(this));
+      calculatedValue = await this.calculate(oldValue, spreadsheet.getPublicSpreadsheet(this));
     }
     catch (err) {
       console.error(err);
@@ -100,7 +100,7 @@ export class PrivateCellNormal extends BaseCell {
     // update dependents if changed
     const changed = oldValue !== calculatedValue;
     if (changed && updateDependents) {
-      spreadsheet.handleCellChange(this, updateChain);
+      await spreadsheet.handleCellChange(this, updateChain);
     }
   }
 }

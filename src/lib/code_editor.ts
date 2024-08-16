@@ -5,6 +5,7 @@ import type { UserCalculateFunction, UserFormatFunction } from './cells/cell_nor
 const ampRegex = new RegExp("&", "g");
 const leftBracketRegex = new RegExp("<", "g");
 const rightBracketRegex = new RegExp(">", "g");
+const AsyncFunction = async function () {}.constructor;
 
 // register languages
 hljs.registerLanguage('javascript', javascript);
@@ -39,7 +40,7 @@ export function getFunctionBody(func: Function | null) {
 }
 
 export function buildCalculateFunction(funcStr: string): UserCalculateFunction {
-  return Function("currentValue", "spreadsheet", funcStr) as UserCalculateFunction;
+  return AsyncFunction("currentValue", "spreadsheet", funcStr) as UserCalculateFunction;
 }
 
 export function buildFormatFunction(funcStr: string): UserFormatFunction {
