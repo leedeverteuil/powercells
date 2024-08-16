@@ -1,4 +1,4 @@
-import { Code, Play } from "lucide-react";
+import { Play } from "lucide-react";
 import { Button } from "./ui/button";
 import { spreadsheet } from "@/lib/spreadsheet";
 import { useState } from "react";
@@ -19,11 +19,6 @@ const Toolbar = () => {
       {/* recalculate all */}
       <Button disabled={isRecalculating} onClick={recalculateAll} variant="secondary">
         <Play className="w-4 h-4 mr-2" /> Recalculate All
-      </Button>
-
-      {/* open hooks drawer */}
-      <Button variant="secondary">
-        <Code className="w-4 h-4 mr-2" /> Edit Hooks
       </Button>
     </div>
   );
