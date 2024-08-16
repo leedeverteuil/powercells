@@ -13,7 +13,7 @@ type Props = {
   cell: PrivateCellNormal;
 };
 
-const exampleFunctionString = "return `** ${currentValue} **`;";
+const exampleFunctionString = "return `** ${value} **`;";
 
 export const FormatFunction = ({ cell }: Props) => {
   const [deleteOpen, setDeleteOpen] = useState(false);

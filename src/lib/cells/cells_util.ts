@@ -1,3 +1,4 @@
+import { letters } from "../spreadsheet";
 import type { CellLocation, CellValue, PrivateCell } from "./cell_types";
 
 // for converting letters to numbers
@@ -28,6 +29,65 @@ export function areLocationsEqual(locationA: CellLocation, locationB: CellLocati
 
 export function getLocationDisplayName(location: CellLocation) {
   return `${numsToLetters[location.col]}${location.row}`.toUpperCase();
+}
+
+export function parseLocationQuery(queryCell: string): CellLocation {
+  // prepare initial
+  queryCell = queryCell ?? "";
+  queryCell = queryCell.trim();
+
+  if (queryCell.length < 2) {
+    throw new Error("Invalid query: must be at least 2 characters long.")
+  }
+
+  let parts: string[] = [];
+
+  // comma format or not
+  if (queryCell.includes(",")) {
+    parts = queryCell.split(",");
+    if (parts.length !== 2) {
+      throw new Error("Invalid query: invalid use of comma.");
+    }
+  }
+  else {
+    parts = [queryCell[0], queryCell.slice(1, queryCell.length)];
+  }
+
+  // parse parts into col and row
+  let col: number;
+  let row: number;
+
+  // col parse
+  const colStr = (parts[0] ?? "").trim().toLowerCase();
+  // can be a single letter
+  if (letters.includes(colStr)) {
+    col = lettersToNums[colStr];
+  }
+  // can be a number from 0 to 25
+  else {
+    col = parseInt(colStr);
+    if (isNaN(col)) {
+      throw new Error("Invalid query: failed to parse column number.");
+    }
+    if (col < 0 || col > 25) {
+      throw new Error("Invalid query: valid column number range is 0 to 25.");
+    }
+  }
+
+  // row parse
+  const rowStr = (parts[1] ?? "").trim();
+  // can be a number from 0 to 49
+  row = parseInt(rowStr);
+  if (isNaN(row)) {
+    throw new Error("Invalid query: failed to parse row number.");
+  }
+  if (row < 0 || row > 49) {
+    throw new Error("Invalid query: valid row number range is 0 to 49.");
+  }
+
+  return {
+    col, row
+  };
 }
 
 export function parseCellLocationFromUserInput(col: string | number, row: number): CellLocation {

@@ -1,5 +1,5 @@
 import type { CellLocation, CellValue } from "./cell_types";
-import { PublicSpreadsheet, spreadsheet } from "../spreadsheet";
+import { spreadsheet } from "../spreadsheet";
 import { BaseCell } from "./cell_base";
 import { getLocationId } from "./cells_util";
 
@@ -20,8 +20,8 @@ export class PublicCellNormal extends BaseCell {
   }
 }
 
-export type UserFormatFunction = ((currentValue: CellValue) => string);
-export type UserCalculateFunction = ((currentValue: CellValue, spreadsheet: PublicSpreadsheet) => Promise<CellValue>);
+export type UserFormatFunction = Function;
+export type UserCalculateFunction = Function;
 
 export class PrivateCellNormal extends BaseCell {
   dependencies: PrivateCellNormal[] = [];
@@ -42,9 +42,11 @@ export class PrivateCellNormal extends BaseCell {
     spreadsheet.handleCellChangeAsync(this);
   }
 
-  addDependency(cell: PrivateCellNormal) {
-    if (!this.dependencies.includes(cell)) {
-      this.dependencies.push(cell);
+  addDependency(...deps: PrivateCellNormal[]) {
+    for (const d of deps) {
+      if (!this.dependencies.includes(d) && d.type === "normal") {
+        this.dependencies.push(d);
+      }
     }
   }
 
@@ -88,7 +90,8 @@ export class PrivateCellNormal extends BaseCell {
     let calculatedValue: CellValue | null = null;
 
     try {
-      calculatedValue = await this.calculate(oldValue, spreadsheet.getPublicSpreadsheet(this));
+      const { get, set, update } = spreadsheet.getPublicFunctions();
+      calculatedValue = await this.calculate(oldValue, get, set, update);
     }
     catch (err) {
       console.error(err);

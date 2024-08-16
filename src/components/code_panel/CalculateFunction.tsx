@@ -13,7 +13,7 @@ type Props = {
   cell: PrivateCellNormal;
 };
 
-const exampleFunctionString = `return currentValue + 5;`;
+const exampleFunctionString = `return value + 5;`;
 
 export const CalculateFunction = ({ cell }: Props) => {
   const [deleteOpen, setDeleteOpen] = useState(false);

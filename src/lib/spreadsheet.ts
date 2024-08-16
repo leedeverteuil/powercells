@@ -1,6 +1,6 @@
 import { PrivateCellNormal } from "./cells/cell_normal";
 import type { CellLocation, CellValue, PrivateCell } from "./cells/cell_types";
-import { findCellAtLocation, getLocationId, parseCellLocationFromUserInput } from "./cells/cells_util";
+import { findCellAtLocation, getLocationId, parseLocationQuery } from "./cells/cells_util";
 
 // types
 export type SpreadsheetSubscriber = (ts: number) => void;
@@ -15,6 +15,12 @@ export type DependencyNode = {
   visited: boolean;
 };
 
+export type PublicFunctions = {
+  get: (query: string) => (CellValue | CellValue[]);
+  set: (query: string, value: CellValue) => void;
+  update: (query: string, handler: (value: CellValue) => CellValue) => void;
+};
+
 // constants
 export const letters = [
   "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
@@ -22,43 +28,10 @@ export const letters = [
   "u", "v", "w", "x", "y", "z"
 ];
 
-export class PublicSpreadsheet {
-  private privateSpreadsheet: PrivateSpreadsheet;
-  private dependentCell: PrivateCellNormal | null = null;
-
-  constructor(privateSpreadsheet: PrivateSpreadsheet, dependentCell: PrivateCellNormal | null = null) {
-    this.privateSpreadsheet = privateSpreadsheet;
-    this.dependentCell = dependentCell;
-  }
-
-  public getCell(col: string | number, row: number): CellValue {
-    const location = parseCellLocationFromUserInput(col, row)
-    const cell = this.privateSpreadsheet.getCell(location);
-
-    // retrieved cell is now a dependency
-    if (this.dependentCell) {
-      this.dependentCell.addDependency(cell);
-    }
-
-    return cell.value;
-  }
-
-  public setCell(col: string | number, row: number, value: CellValue) {
-    const location = parseCellLocationFromUserInput(col, row)
-    const cell = this.privateSpreadsheet.getCell(location);
-    cell.setValue(value);
-  }
-}
-
 export class PrivateSpreadsheet {
   selectedLocation: CellLocation | null = null;
   grid: PrivateCell[][] = [];
-  publicSpreadsheet: PublicSpreadsheet;
   subscriberRecords: SpreadsheetSubscriberRecord[] = [];
-
-  constructor() {
-    this.publicSpreadsheet = new PublicSpreadsheet(this);
-  }
 
   init() {
     this.recalculate().then().catch(console.error);
@@ -67,13 +40,6 @@ export class PrivateSpreadsheet {
   destroy() {
     // todo
     console.log("destroying spreadsheet");
-  }
-
-  getPublicSpreadsheet(dependentCell?: PrivateCellNormal): PublicSpreadsheet {
-    // anytime the dependent cell uses public spreadsheet's getCell()
-    // it will add that cell retrieved from getCell
-    // to the depending cell's dependencies
-    return new PublicSpreadsheet(this, dependentCell);
   }
 
   /** @returns unsubscribe function */
@@ -164,6 +130,85 @@ export class PrivateSpreadsheet {
 
     this.selectedLocation = location;
     this.updateSubscribers(deps);
+  }
+
+  public runQuery(query: string): PrivateCell[] {
+    const results: PrivateCell[] = [];
+
+    // is range or not
+    if (query.includes(":")) {
+      // split by colon
+      const rangeParts = query.split(":");
+
+      if (rangeParts.length !== 2) {
+        throw new Error("Invalid query: invalid use of range symbol ':'");
+      }
+
+      // parse individual parts
+      const locA = parseLocationQuery(rangeParts[0]);
+      const locB = parseLocationQuery(rangeParts[1]);
+
+      // build range of cells
+      const startCol = locA.col;
+      const endCol = locB.col;
+      const startRow = locA.row;
+      const endRow = locB.row;
+
+      if (startCol > endCol) throw new Error("Invalid query: range start column cannot be greater than end column");
+      if (startRow > endRow) throw new Error("Invalid query: range start row cannot be greater than end row");
+      if (startRow === endRow && startCol === endCol) throw new Error("Invalid query: range start and end locations cannot be equal")
+
+      for (let r = startRow; r <= endRow; r++) {
+        for (let c = startCol; c <= endCol; c++) {
+          results.push(this.getCell({ col: c, row: r }));
+        }
+      }
+    }
+    else {
+      const loc = parseLocationQuery(query);
+      results.push(this.getCell(loc));
+    }
+
+    return results;
+  }
+
+  public getPublicFunctions(dependentCell?: PrivateCell): PublicFunctions {
+    // get one or many
+    const get = (query: string) => {
+      const results = this.runQuery(query);
+
+      // link dependencies
+      if (dependentCell) { dependentCell.addDependency(...results); }
+
+      const len = results.length
+      if (len === 0) {
+        return "";
+      }
+      else if (len === 1) {
+        return results[0].value;
+      }
+      else {
+        return results.map(r => r.value);
+      }
+    };
+
+    // set one or many
+    const set = (query: string, value: CellValue) => {
+      const results = this.runQuery(query);
+      for (const r of results) {
+        r.setValue(value);
+      }
+    };
+
+    // update one or many
+    const update = (query: string, handler: (value: CellValue) => CellValue) => {
+      const results = this.runQuery(query);
+      for (const r of results) {
+        r.setValue(handler(r.value));
+      }
+    };
+
+    return { get, set, update };
   }
 
   private updateSubscribers(dependencies: string[]) {
