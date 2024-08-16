@@ -5,7 +5,7 @@ export type CellLocation = {
   col: number;
 };
 
-export type CellValue = string | number | boolean;
+export type CellValue = string | number | boolean | object;
 
 export type CellType = "normal" | "button" | "toggle" | "slider" | "timer";
 
