@@ -80,7 +80,6 @@ export const CalculateFunction = ({ cell }: Props) => {
             {isFuncDifferent ? (
               <Button
                 onClick={saveChanges}
-                variant="secondary"
                 disabled={!isFuncDifferent}
                 className="w-full">
                 Save changes

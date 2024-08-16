@@ -9,6 +9,12 @@ export type SpreadsheetSubscriberRecord = {
   dependencies: string[];
 };
 
+export type DependencyNode = {
+  cell: PrivateCellNormal;
+  neighbors: DependencyNode[];
+  visited: boolean;
+};
+
 // constants
 export const letters = [
   "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
@@ -115,17 +121,10 @@ export class PrivateSpreadsheet {
   }
 
   async recalculate() {
-    for (const row of this.grid) {
-      if (Array.isArray(row)) {
-        for (const cell of row) {
-          if (cell && cell.type === "normal") {
-            // tell runCalculate to not update dependencies.
-            // we're updating every cell.
-            await cell.runCalculate(false);
-            this.updateSubscribers([getLocationId(cell.location)]);
-          }
-        }
-      }
+    // run all in order
+    for (const cell of this.getCalculateOrder()) {
+      await cell.runCalculate(false);
+      this.updateSubscribers([getLocationId(cell.location)]);
     }
   }
 
@@ -178,6 +177,45 @@ export class PrivateSpreadsheet {
         catch (err) { console.warn(err); }
       }
     }
+  }
+
+  private getAllCells(): PrivateCell[] {
+    return this.grid.reduce((acc, row) => {
+      return [...acc, ...(row ?? [])];
+    }, []);
+  }
+
+  private getCalculateOrder(): PrivateCellNormal[] {
+    const cells = this.getAllCells().filter(c => c && c.type === "normal");
+
+    // build nodes with dependents as neighbors
+    const nodes: DependencyNode[] = cells.map(c => { return { cell: c, neighbors: [], visited: false } });
+    for (const node of nodes) {
+      const deps = node.cell.dependencies;
+      for (const dep of deps) {
+        const otherNode = nodes.find(n => n.cell === dep)!;
+        otherNode.neighbors.push(node);
+      }
+    }
+
+    // iterative topological sort
+    const stack: DependencyNode[] = nodes.filter(n => n.cell.dependencies.length === 0);
+    const order: PrivateCellNormal[] = [];
+
+    while (stack.length !== 0) {
+      const node = stack.pop();
+      if (node && !node.visited) {
+        node.visited = true;
+        order.push(node.cell);
+        for (const n of node.neighbors) {
+          if (!n.visited) {
+            stack.push(n);
+          }
+        }
+      }
+    }
+
+    return order;
   }
 }
 
