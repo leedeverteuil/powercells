@@ -1,13 +1,14 @@
-const defaultTheme = require('tailwindcss/defaultTheme')
+const defaultTheme = require("tailwindcss/defaultTheme");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx,astro}',
-    './components/**/*.{ts,tsx,astro}',
-    './app/**/*.{ts,tsx,astro}',
-    './src/**/*.{ts,tsx,astro}',
+    "./pages/**/*.{ts,tsx,astro}",
+    "./components/ui/*.tsx",
+    "./components/**/*.{ts,tsx,astro}",
+    "./app/**/*.{ts,tsx,astro}",
+    "./src/**/*.{ts,tsx,astro}",
   ],
   prefix: "",
   theme: {
@@ -80,4 +81,4 @@ module.exports = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
+};

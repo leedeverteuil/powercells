@@ -1,4 +1,4 @@
-import type { CellLocation, CellValue } from "./cell_types";
+import type { CellLocation, CellStyle, CellStyleProperty, CellValue } from "./cell_types";
 import { spreadsheet } from "../spreadsheet";
 import { BaseCell } from "./cell_base";
 import { getLocationId } from "./cells_util";
@@ -28,6 +28,7 @@ export class PrivateCellNormal extends BaseCell {
   value: CellValue;
   format: UserFormatFunction | null = null;
   calculate: UserCalculateFunction | null = null;
+  style: CellStyle = { bold: false, italic: false, underline: false };
 
   constructor(
     location: CellLocation,
@@ -67,6 +68,11 @@ export class PrivateCellNormal extends BaseCell {
 
   setFormatFunction(func: UserFormatFunction | null) {
     this.format = func;
+    spreadsheet.handleCellChangeAsync(this);
+  }
+
+  setStyleProp(prop: CellStyleProperty, enabled: boolean) {
+    this.style[prop] = enabled;
     spreadsheet.handleCellChangeAsync(this);
   }
 

@@ -9,6 +9,11 @@ export type CellValue = string | number | boolean | object;
 
 export type CellType = "normal" | "button" | "toggle" | "slider" | "timer";
 
+export type CellStyleProperty = "bold" | "italic" | "underline";
+export type CellStyle = {
+  [prop in CellStyleProperty]: boolean;
+};
+
 export type PrivateCell = PrivateCellNormal;
 export type PublicCell = PublicCellNormal;
 

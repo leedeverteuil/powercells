@@ -1,4 +1,7 @@
-import { type CellLocation } from "@/lib/cells/cell_types";
+import {
+  type CellLocation,
+  type CellStyleProperty,
+} from "@/lib/cells/cell_types";
 import {
   cellValueToString,
   getLocationDisplayName,
@@ -13,6 +16,7 @@ import { useRenderSubscriber } from "@/lib/render_subscriber";
 import { CalculateFunction } from "./CalculateFunction";
 import { CellDependencies } from "./CellDependencies";
 import { FormatFunction } from "./FormatFunction";
+import { CellStyle } from "./CellStyle";
 
 type Props = {
   location: CellLocation;
@@ -62,6 +66,13 @@ export const CellEditor = ({ location }: Props) => {
 
         {/* format function */}
         <FormatFunction cell={cell}></FormatFunction>
+
+        {/* styling options */}
+        <CellStyle
+          cell={cell}
+          handleToggle={(prop: CellStyleProperty, enabled: boolean) =>
+            cell.setStyleProp(prop, enabled)
+          }></CellStyle>
       </div>
     </div>
   );
