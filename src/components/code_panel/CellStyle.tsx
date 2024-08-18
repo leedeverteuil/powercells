@@ -19,6 +19,7 @@ export const CellStyle = ({ cell, handleToggle }: Props) => {
   return (
     <div className="grid w-full max-w-sm items-center gap-1.5">
       <Label>Text Style</Label>
+
       <div className="flex items-center justify-start gap-1">
         <Toggle
           pressed={bold}
