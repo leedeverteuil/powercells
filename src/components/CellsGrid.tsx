@@ -5,11 +5,14 @@ import RowLabelCell from "./cells/RowLabelCell";
 import { HeaderLabelCell } from "./cells/HeaderLabelCell";
 import { ContentCell } from "./cells/ContentCell";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
-import { findCellAtLocation } from "@/lib/cells/cells_util";
 import type { CellLocation } from "@/lib/cells/cell_types";
 
 const CellsGrid = () => {
-  useRenderSubscriber(["grid"]);
+  useRenderSubscriber(["grid", "columnSizes"]);
+
+  const gridStyle = {
+    gridTemplateColumns: spreadsheet.getGridTemplateColumns(),
+  };
 
   // build rendered cells
   const renderedCells: ReactElement[] = [];
@@ -26,7 +29,10 @@ const CellsGrid = () => {
           <HeaderLabelCell
             key={`${col}-col-label`}
             row={row}
-            col={col}></HeaderLabelCell>
+            col={col}
+            onResize={(delta) =>
+              spreadsheet.updateCustomColumnSize(col, delta)
+            }></HeaderLabelCell>
         );
       } else {
         const renderRow = row - 1;
@@ -42,7 +48,9 @@ const CellsGrid = () => {
 
   return (
     <div className="max-h-screen overflow-y-scroll">
-      <div className="pr-32 text-xs pb-80 cell-grid">{renderedCells}</div>
+      <div style={gridStyle} className="pr-32 text-xs pb-80 cell-grid">
+        {renderedCells}
+      </div>
     </div>
   );
 };

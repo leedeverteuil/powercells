@@ -27,7 +27,7 @@ export const ContentCell = ({ location }: Props) => {
   // tailwind
   const colBorderClass = col === 0 ? "border-l-0" : "";
   const selectedClass = selected
-    ? "ring-[4px] ring-lime-300/50 dark:ring-lime-700/50 z-[1] outline outline-1 outline-lime-500 rounded-sm"
+    ? "ring-[4px] ring-[#DFF9B4] dark:ring-[#2B4311] z-[1] outline outline-1 outline-lime-500 rounded-sm"
     : "";
 
   const styleClasses = cell

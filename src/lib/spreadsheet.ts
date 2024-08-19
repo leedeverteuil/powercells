@@ -2,6 +2,11 @@ import { PrivateCellNormal } from "./cells/cell_normal";
 import type { CellLocation, CellValue, PrivateCell } from "./cells/cell_types";
 import { findCellAtLocation, getLocationId, parseLocationQuery } from "./cells/cells_util";
 
+// constants
+const DEFAULT_COL_WIDTH = 120;
+const MIN_COL_WIDTH = 60;
+const MAX_COL_WIDTH = 300;
+
 // types
 export type SpreadsheetSubscriber = (ts: number) => void;
 export type SpreadsheetSubscriberRecord = {
@@ -21,6 +26,10 @@ export type PublicFunctions = {
   update: (query: string, handler: (value: CellValue) => CellValue) => void;
 };
 
+export type CustomColSizes = {
+  [col: number]: number;
+};
+
 // constants
 export const letters = [
   "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
@@ -32,6 +41,7 @@ export class PrivateSpreadsheet {
   selectedLocation: CellLocation | null = null;
   grid: PrivateCell[][] = [];
   subscriberRecords: SpreadsheetSubscriberRecord[] = [];
+  customColSizes: CustomColSizes = {};
 
   init() {
     this.recalculate().then().catch(console.error);
@@ -130,6 +140,28 @@ export class PrivateSpreadsheet {
 
     this.selectedLocation = location;
     this.updateSubscribers(deps);
+  }
+
+  getGridTemplateColumns() {
+    let str = "";
+
+    // there are 26 columns
+    for (let i = 0; i < 26; i++) {
+      const customSize = this.customColSizes[i] ?? DEFAULT_COL_WIDTH;
+      str += ` ${customSize}px`;
+    }
+
+    return `40px${str}`;
+  }
+
+  updateCustomColumnSize(col: number, delta: number) {
+    const current = this.customColSizes[col] ?? 120;
+    this.customColSizes[col] = Math.max(
+      Math.min(MAX_COL_WIDTH, current - delta),
+      MIN_COL_WIDTH
+    );
+
+    this.updateSubscribers(["columnSizes"]);
   }
 
   public runQuery(query: string): PrivateCell[] {
