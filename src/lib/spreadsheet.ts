@@ -1,6 +1,6 @@
 import { PrivateCellNormal } from "./cells/cell_normal";
-import type { CellLocation, CellValue, PrivateCell } from "./cells/cell_types";
-import { findCellAtLocation, getLocationId, parseLocationQuery } from "./cells/cells_util";
+import type { CellLocation, CellType, CellValue, PrivateCell } from "./cells/cell_types";
+import { findCellAtLocation, getConstructorForCellType, getLocationId, parseLocationQuery } from "./cells/cells_util";
 
 // constants
 const DEFAULT_COL_WIDTH = 120;
@@ -69,6 +69,29 @@ export class PrivateSpreadsheet {
     };
   }
 
+  setCellType(location: CellLocation, type: CellType) {
+    const existingCell = findCellAtLocation(this.grid, location);
+    const cellConstructor = getConstructorForCellType(type);
+
+    if (!existingCell || existingCell.constructor !== cellConstructor) {
+      // need to create button cell
+      const { row, col } = location;
+      const grid = this.grid;
+
+      // make row if not already made
+      let gridRow = grid[row];
+      if (gridRow === undefined) {
+        grid[row] = [];
+        gridRow = grid[row];
+      }
+
+      const newCell = new cellConstructor(location);
+      gridRow[col] = newCell;
+
+      this.handleCellChangeAsync(newCell);
+    }
+  }
+
   getCell(location: CellLocation): PrivateCell {
     const existingCell = findCellAtLocation(this.grid, location);
 
@@ -104,7 +127,7 @@ export class PrivateSpreadsheet {
     }
   }
 
-  handleCellChangeAsync(changedCell: PrivateCellNormal) {
+  handleCellChangeAsync(changedCell: PrivateCell) {
     this.handleCellChange(changedCell, [])
       .then()
       .catch(err => {
@@ -112,15 +135,17 @@ export class PrivateSpreadsheet {
       });
   }
 
-  async handleCellChange(changedCell: PrivateCellNormal, updateChain: string[] = []) {
+  async handleCellChange(changedCell: PrivateCell, updateChain: string[] = []) {
     this.updateSubscribers([getLocationId(changedCell.location), "grid"]);
 
     // any cells that depend on changed cell should recalculate
-    for (const row of spreadsheet.grid) {
-      if (Array.isArray(row)) {
-        for (const cell of row) {
-          if (cell && cell.type === "normal" && cell.dependencies.includes(changedCell)) {
-            await cell.runCalculate(true, updateChain);
+    if (changedCell instanceof PrivateCellNormal) {
+      for (const row of spreadsheet.grid) {
+        if (Array.isArray(row)) {
+          for (const cell of row) {
+            if (cell && cell instanceof PrivateCellNormal && cell.dependencies.includes(changedCell)) {
+              await cell.runCalculate(true, updateChain);
+            }
           }
         }
       }
@@ -204,23 +229,28 @@ export class PrivateSpreadsheet {
     return results;
   }
 
-  public getPublicFunctions(dependentCell?: PrivateCell): PublicFunctions {
+  public getPublicFunctions(dependentCell?: PrivateCellNormal): PublicFunctions {
     // get one or many
     const get = (query: string) => {
       const results = this.runQuery(query);
 
-      // link dependencies
-      if (dependentCell) { dependentCell.addDependency(...results); }
+      // link dependencies (only normal cells)
+      if (dependentCell) {
+        dependentCell.addDependency(...results.filter(c => c instanceof PrivateCellNormal));
+      }
 
       const len = results.length
       if (len === 0) {
         return "";
       }
       else if (len === 1) {
-        return results[0].value;
+        const firstResult = results[0];
+        return firstResult instanceof PrivateCellNormal ? firstResult.value : "";
       }
       else {
-        return results.map(r => r.value);
+        return results.map(r => {
+          return r instanceof PrivateCellNormal ? r.value : "";
+        });
       }
     };
 
@@ -228,7 +258,13 @@ export class PrivateSpreadsheet {
     const set = (query: string, value: CellValue) => {
       const results = this.runQuery(query);
       for (const r of results) {
-        r.setValue(value);
+        if (r instanceof PrivateCellNormal) {
+          r.setValue(value);
+        }
+        else {
+          // todo console warning to user that they are trying
+          // to update a widget
+        }
       }
     };
 
@@ -236,7 +272,13 @@ export class PrivateSpreadsheet {
     const update = (query: string, handler: (value: CellValue) => CellValue) => {
       const results = this.runQuery(query);
       for (const r of results) {
-        r.setValue(handler(r.value));
+        if (r instanceof PrivateCellNormal) {
+          r.setValue(handler(r.value));
+        }
+        else {
+          // todo console warning to user that they are trying
+          // to update a widget
+        }
       }
     };
 
@@ -263,7 +305,7 @@ export class PrivateSpreadsheet {
   }
 
   private getCalculateOrder(): PrivateCellNormal[] {
-    const cells = this.getAllCells().filter(c => c && c.type === "normal");
+    const cells = this.getAllCells().filter(c => c && c instanceof PrivateCellNormal);
 
     // build nodes with dependents as neighbors
     const nodes: DependencyNode[] = cells.map(c => { return { cell: c, neighbors: [], visited: false } });

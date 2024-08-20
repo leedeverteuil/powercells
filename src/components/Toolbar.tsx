@@ -1,4 +1,4 @@
-import { Play } from "lucide-react";
+import { BookText, Play } from "lucide-react";
 import { Button } from "./ui/button";
 import { spreadsheet } from "@/lib/spreadsheet";
 import { useState } from "react";
@@ -17,8 +17,17 @@ const Toolbar = () => {
   return (
     <div className="flex items-center justify-start gap-2 px-5 pb-4 border-b border-colors">
       {/* recalculate all */}
-      <Button disabled={isRecalculating} onClick={recalculateAll} variant="secondary">
+      <Button
+        disabled={isRecalculating}
+        onClick={recalculateAll}
+        variant="secondary">
         <Play className="w-4 h-4 mr-2" /> Recalculate All
+      </Button>
+
+      {/* open docs */}
+      <Button
+        variant="secondary">
+        <BookText className="w-4 h-4 mr-2" /> Show Docs
       </Button>
     </div>
   );

@@ -1,9 +1,6 @@
+import { type CellLocation, type CellType } from "@/lib/cells/cell_types";
 import {
-  type CellLocation,
-  type CellStyleProperty,
-} from "@/lib/cells/cell_types";
-import {
-  cellValueToString,
+  getCellTypeFromConstructor,
   getLocationDisplayName,
   getLocationId,
 } from "@/lib/cells/cells_util";
@@ -11,12 +8,11 @@ import { Ban } from "lucide-react";
 import { Button } from "../ui/button";
 import { spreadsheet } from "@/lib/spreadsheet";
 import { CellTypeSelect } from "./CellTypeSelect";
-import { CellValueInput } from "./CellValueInput";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
-import { CalculateFunction } from "./CalculateFunction";
-import { CellDependencies } from "./CellDependencies";
-import { FormatFunction } from "./FormatFunction";
-import { CellStyle } from "./CellStyle";
+import { CellNormalFields } from "./CellNormalFields";
+import { PrivateCellNormal } from "@/lib/cells/cell_normal";
+import { PrivateCellButton } from "@/lib/cells/cell_button";
+import { CellButtonFields } from "./CellButtonFields";
 
 type Props = {
   location: CellLocation;
@@ -49,30 +45,20 @@ export const CellEditor = ({ location }: Props) => {
         {/* cell type editor */}
         {/* todo: make this do something */}
         <CellTypeSelect
-          value={"normal"}
-          onValueChange={() => {}}></CellTypeSelect>
+          value={getCellTypeFromConstructor(cell.constructor)}
+          onValueChange={(value) => {
+            if (value) {
+              spreadsheet.setCellType(location, value as CellType);
+            }
+          }}></CellTypeSelect>
 
-        {/* value editor */}
-        <CellValueInput
-          value={cellValueToString(cell.value)}
-          cellValue={cell.value}
-          onInput={(value) => cell.setValue(value)}></CellValueInput>
-
-        {/* calculate function */}
-        <CalculateFunction cell={cell} />
-
-        {/* dependencies */}
-        <CellDependencies cell={cell}></CellDependencies>
-
-        {/* format function */}
-        <FormatFunction cell={cell}></FormatFunction>
-
-        {/* styling options */}
-        <CellStyle
-          cell={cell}
-          handleToggle={(prop: CellStyleProperty, enabled: boolean) =>
-            cell.setStyleProp(prop, enabled)
-          }></CellStyle>
+        {(() => {
+          if (cell instanceof PrivateCellNormal) {
+            return <CellNormalFields cell={cell} />;
+          } else if (cell instanceof PrivateCellButton) {
+            return <CellButtonFields cell={cell} />;
+          }
+        })()}
       </div>
     </div>
   );

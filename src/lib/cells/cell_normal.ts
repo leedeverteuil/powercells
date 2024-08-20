@@ -3,23 +3,6 @@ import { spreadsheet } from "../spreadsheet";
 import { BaseCell } from "./cell_base";
 import { getLocationId } from "./cells_util";
 
-export class PublicCellNormal extends BaseCell {
-  private cell: PrivateCellNormal;
-
-  constructor(location: CellLocation, cell: PrivateCellNormal) {
-    super("normal", location);
-    this.cell = cell;
-  }
-
-  getValue() {
-    return this.cell.value;
-  }
-
-  setValue(value: CellValue) {
-    this.cell.setValue(value);
-  }
-}
-
 export type UserFormatFunction = Function;
 export type UserCalculateFunction = Function;
 
@@ -32,9 +15,9 @@ export class PrivateCellNormal extends BaseCell {
 
   constructor(
     location: CellLocation,
-    value: CellValue,
+    value: CellValue = "",
   ) {
-    super("normal", location);
+    super(location);
     this.value = value;
   }
 
@@ -45,7 +28,7 @@ export class PrivateCellNormal extends BaseCell {
 
   addDependency(...deps: PrivateCellNormal[]) {
     for (const d of deps) {
-      if (!this.dependencies.includes(d) && d.type === "normal") {
+      if (!this.dependencies.includes(d) && d instanceof PrivateCellNormal) {
         this.dependencies.push(d);
       }
     }
@@ -96,7 +79,7 @@ export class PrivateCellNormal extends BaseCell {
     let calculatedValue: CellValue | null = null;
 
     try {
-      const { get, set, update } = spreadsheet.getPublicFunctions();
+      const { get, set, update } = spreadsheet.getPublicFunctions(this);
       calculatedValue = await this.calculate(oldValue, get, set, update);
     }
     catch (err) {

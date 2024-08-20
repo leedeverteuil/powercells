@@ -27,7 +27,7 @@ export const CellValueInput = ({ value, onInput, cellValue }: Props) => {
           autoFocus
           onInput={inputHandler}
           value={value}
-          type="value"
+          type="text"
           id="value"
           placeholder=""
           className="mb-1"

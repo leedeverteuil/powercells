@@ -27,6 +27,7 @@ export const CellTypeSelect = ({ onValueChange, value }: Props) => {
           <SelectGroup>
             <SelectLabel>Cell Types</SelectLabel>
             <SelectItem value="normal">Normal</SelectItem>
+            <SelectItem value="button">Button</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>
