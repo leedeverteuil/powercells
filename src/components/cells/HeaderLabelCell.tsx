@@ -1,3 +1,5 @@
+import { useRenderSubscriber } from "@/lib/render_subscriber";
+import { settings } from "@/lib/settings";
 import { letters } from "@/lib/spreadsheet";
 import { useEffect, useState } from "react";
 
@@ -8,6 +10,8 @@ type Props = {
 };
 
 export const HeaderLabelCell = ({ row, col, onResize }: Props) => {
+  useRenderSubscriber(["columnHeaders"]);
+
   const [isResizing, setIsResizing] = useState(false);
 
   const cellLetter = letters[col];
@@ -48,7 +52,7 @@ export const HeaderLabelCell = ({ row, col, onResize }: Props) => {
     <div
       className={`p-1 border-[0.5px] ${borderClass} border-zinc-200 dark:border-zinc-800 text-center
                text-zinc-600 dark:text-zinc-200 font-medium relative`}>
-      {cellLetter.toUpperCase()}
+      {settings.useColumnNumbers ? col : cellLetter.toUpperCase()}
 
       {/* for resizing */}
       <div

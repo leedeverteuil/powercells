@@ -189,7 +189,7 @@ export class PrivateSpreadsheet {
     this.updateSubscribers(["columnSizes"]);
   }
 
-  public runQuery(query: string): PrivateCell[] {
+  runQuery(query: string): PrivateCell[] {
     const results: PrivateCell[] = [];
 
     // is range or not
@@ -229,7 +229,7 @@ export class PrivateSpreadsheet {
     return results;
   }
 
-  public getPublicFunctions(dependentCell?: PrivateCellNormal): PublicFunctions {
+  getPublicFunctions(dependentCell?: PrivateCellNormal): PublicFunctions {
     // get one or many
     const get = (query: string) => {
       const results = this.runQuery(query);
@@ -285,7 +285,7 @@ export class PrivateSpreadsheet {
     return { get, set, update };
   }
 
-  private updateSubscribers(dependencies: string[]) {
+  updateSubscribers(dependencies: string[]) {
     const ts = Date.now();
 
     // look for subscribers matching any of those dependencies and fire them
