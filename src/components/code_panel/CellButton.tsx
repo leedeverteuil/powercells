@@ -31,7 +31,7 @@ export const CellButton = ({ cell }: Props) => {
       disabled={loading}
       onClick={onClick}
       variant={getButtonVariant(cell.buttonStyle)}
-      className="!h-6 min-w-full !rounded-sm">
+      className="!h-6 min-w-full !rounded-sm !text-xs">
       {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <></>}
       {cell.label}
     </Button>

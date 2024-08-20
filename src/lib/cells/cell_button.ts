@@ -3,18 +3,17 @@ import { spreadsheet } from "../spreadsheet";
 import { BaseCell } from "./cell_base";
 
 export type CellButtonStyle = "primary" | "secondary" | "destructive";
-export type UserButtonActionFunction = Function;
 
 export class PrivateCellButton extends BaseCell {
   label = "Click Me";
   buttonStyle: CellButtonStyle = "primary";
-  action: UserButtonActionFunction | null = null;
+  action: Function | null = null;
 
   constructor(
     location: CellLocation,
     label: string = "Click Me",
     buttonStyle: CellButtonStyle = "primary",
-    action: UserButtonActionFunction | null = null,
+    action: Function | null = null,
   ) {
     super(location);
     this.label = label;
@@ -32,7 +31,7 @@ export class PrivateCellButton extends BaseCell {
     spreadsheet.handleCellChangeAsync(this);
   }
 
-  setActionFunction(func: UserButtonActionFunction | null) {
+  setActionFunction(func: Function | null) {
     this.action = func;
     spreadsheet.handleCellChangeAsync(this);
   }

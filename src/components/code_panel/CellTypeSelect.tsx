@@ -28,6 +28,7 @@ export const CellTypeSelect = ({ onValueChange, value }: Props) => {
             <SelectLabel>Cell Types</SelectLabel>
             <SelectItem value="normal">Normal</SelectItem>
             <SelectItem value="button">Button</SelectItem>
+            <SelectItem value="timer">Timer</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>

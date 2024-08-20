@@ -1,5 +1,6 @@
 import type { PrivateCellButton } from "./cell_button";
 import type { PrivateCellNormal } from "./cell_normal";
+import type { PrivateCellTimer } from "./cell_timer";
 
 export type CellLocation = {
   row: number;
@@ -16,12 +17,5 @@ export type CellStyle = {
   [prop in CellStyleProperty]: boolean;
 };
 
-export type PrivateCell = PrivateCellNormal | PrivateCellButton;
+export type PrivateCell = PrivateCellNormal | PrivateCellButton | PrivateCellTimer;
 
-// export type PrivateCellWithTimer = BaseCell & {
-//   type: "timer";
-//   id: string;
-//   label: string;
-//   loopTimeMs: number;
-//   timeLeftMs: number;
-// };

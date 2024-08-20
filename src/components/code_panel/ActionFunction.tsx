@@ -8,14 +8,15 @@ import { CodeTextArea } from "./CodeTextArea";
 import { Button } from "../ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { DeleteFunctionDialog } from "./DeleteFunctionDialog";
+import type { PrivateCellTimer } from "@/lib/cells/cell_timer";
 
 type Props = {
-  cell: PrivateCellButton;
+  cell: PrivateCellButton | PrivateCellTimer;
 };
 
 const exampleFunctionString = `// do some stuff`;
 
-export const ButtonActionFunction = ({ cell }: Props) => {
+export const ActionFunction = ({ cell }: Props) => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [funcStr, setFuncStr] = useState("");
   const [inputFuncStr, setInputFuncStr] = useState("");

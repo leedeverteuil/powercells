@@ -1,6 +1,7 @@
 import { letters } from "../spreadsheet";
 import { PrivateCellButton } from "./cell_button";
 import { PrivateCellNormal } from "./cell_normal";
+import { PrivateCellTimer } from "./cell_timer";
 import type { CellLocation, CellType, CellValue, PrivateCell } from "./cell_types";
 
 // for converting letters to numbers
@@ -23,18 +24,16 @@ const numsToLetters: { [num: number]: string } = {
 // functions
 export function getConstructorForCellType(type: CellType) {
   if (type === "normal") return PrivateCellNormal;
-  else if (type === "button") return PrivateCellButton;
-
-  // todo timer
-  throw new Error("did not do timer as yet")
+  if (type === "button") return PrivateCellButton;
+  if (type === "timer") return PrivateCellTimer;
+  throw new Error("Invalid cell type");
 }
 
 export function getCellTypeFromConstructor(constructor: Function): CellType {
   if (constructor === PrivateCellNormal) return "normal";
-  else if (constructor === PrivateCellButton) return "button";
-
-  // todo timer
-  throw new Error("did not do timer as yet")
+  if (constructor === PrivateCellButton) return "button";
+  if (constructor === PrivateCellTimer) return "timer";
+  throw new Error("Invalid constructor (bug)");
 }
 
 export function getLocationId(location: CellLocation) {

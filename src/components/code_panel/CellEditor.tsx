@@ -13,6 +13,8 @@ import { CellNormalFields } from "./CellNormalFields";
 import { PrivateCellNormal } from "@/lib/cells/cell_normal";
 import { PrivateCellButton } from "@/lib/cells/cell_button";
 import { CellButtonFields } from "./CellButtonFields";
+import { PrivateCellTimer } from "@/lib/cells/cell_timer";
+import { CellTimerFields } from "./CellTimerFields";
 
 type Props = {
   location: CellLocation;
@@ -43,7 +45,6 @@ export const CellEditor = ({ location }: Props) => {
 
       <div className="px-5 py-3 space-y-5">
         {/* cell type editor */}
-        {/* todo: make this do something */}
         <CellTypeSelect
           value={getCellTypeFromConstructor(cell.constructor)}
           onValueChange={(value) => {
@@ -57,6 +58,8 @@ export const CellEditor = ({ location }: Props) => {
             return <CellNormalFields cell={cell} />;
           } else if (cell instanceof PrivateCellButton) {
             return <CellButtonFields cell={cell} />;
+          } else if (cell instanceof PrivateCellTimer) {
+            return <CellTimerFields cell={cell} />;
           }
         })()}
       </div>

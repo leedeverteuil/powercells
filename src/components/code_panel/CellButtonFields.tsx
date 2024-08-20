@@ -1,7 +1,7 @@
 import type { PrivateCellButton } from "@/lib/cells/cell_button";
 import { CellLabelInput } from "./CellLabelInput";
 import { CellButtonStyleSelect } from "./CellButtonStyleSelect";
-import { ButtonActionFunction } from "./ButtonActionFunction";
+import { ActionFunction } from "./ActionFunction";
 
 interface Props {
   cell: PrivateCellButton;
@@ -23,7 +23,7 @@ export function CellButtonFields({ cell }: Props) {
         }></CellButtonStyleSelect>
 
       {/* action function */}
-      <ButtonActionFunction cell={cell} />
+      <ActionFunction cell={cell} />
     </>
   );
 }

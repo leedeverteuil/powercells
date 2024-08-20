@@ -4,6 +4,8 @@ import { getLocationId } from "@/lib/cells/cells_util";
 import { PrivateCellNormal } from "@/lib/cells/cell_normal";
 import { PrivateCellButton } from "@/lib/cells/cell_button";
 import { CellButton } from "../code_panel/CellButton";
+import { PrivateCellTimer } from "@/lib/cells/cell_timer";
+import { CellTimer } from "../code_panel/CellTimer";
 
 type Props = {
   cell: PrivateCell | null;
@@ -33,6 +35,11 @@ export const CellContent = ({ cell, location }: Props) => {
         // button cells
         else if (cell instanceof PrivateCellButton) {
           return <CellButton cell={cell} />;
+        }
+
+        // timer cells
+        else if (cell instanceof PrivateCellTimer) {
+          return <CellTimer cell={cell} />;
         }
       })()}
     </span>
