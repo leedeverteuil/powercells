@@ -1,7 +1,5 @@
 import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
-import type { UserCalculateFunction, UserFormatFunction } from './cells/cell_normal';
-import type { UserButtonActionFunction } from './cells/cell_button';
 
 const ampRegex = new RegExp("&", "g");
 const leftBracketRegex = new RegExp("<", "g");
@@ -40,16 +38,16 @@ export function getFunctionBody(func: Function | null) {
   return lines.join("\n");
 }
 
-export function buildCalculateFunction(funcStr: string): UserCalculateFunction {
-  return AsyncFunction("value", "get", "set", "update", funcStr) as UserCalculateFunction;
+export function buildCalculateFunction(funcStr: string): Function {
+  return AsyncFunction("value", "get", "set", "update", funcStr) as Function;
 }
 
-export function buildFormatFunction(funcStr: string): UserFormatFunction {
-  return Function("value", funcStr) as UserFormatFunction;
+export function buildFormatFunction(funcStr: string): Function {
+  return Function("value", funcStr) as Function;
 }
 
-export function buildButtonActionFunction(funcStr: string): UserButtonActionFunction {
-  return AsyncFunction("get", "set", "update", funcStr) as UserButtonActionFunction;
+export function buildButtonActionFunction(funcStr: string): Function {
+  return AsyncFunction("get", "set", "update", funcStr) as Function;
 }
 
 export function cleanCodeForInnerHTML(code: string) {

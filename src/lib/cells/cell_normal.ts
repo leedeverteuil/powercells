@@ -2,15 +2,13 @@ import type { CellLocation, CellStyle, CellStyleProperty, CellValue } from "./ce
 import { spreadsheet } from "../spreadsheet";
 import { BaseCell } from "./cell_base";
 import { getLocationId } from "./cells_util";
-
-export type UserFormatFunction = Function;
-export type UserCalculateFunction = Function;
+import { handleLogging } from "../console";
 
 export class PrivateCellNormal extends BaseCell {
   dependencies: PrivateCellNormal[] = [];
   value: CellValue;
-  format: UserFormatFunction | null = null;
-  calculate: UserCalculateFunction | null = null;
+  format: Function | null = null;
+  calculate: Function | null = null;
   style: CellStyle = { bold: false, italic: false, underline: false };
 
   constructor(
@@ -38,7 +36,7 @@ export class PrivateCellNormal extends BaseCell {
     this.dependencies = [];
   }
 
-  setCalculateFunction(func: UserCalculateFunction | null) {
+  setCalculateFunction(func: Function | null) {
     this.calculate = func;
     if (func) {
       this.runCalculate()
@@ -49,7 +47,7 @@ export class PrivateCellNormal extends BaseCell {
     }
   }
 
-  setFormatFunction(func: UserFormatFunction | null) {
+  setFormatFunction(func: Function | null) {
     this.format = func;
     spreadsheet.handleCellChangeAsync(this);
   }
@@ -78,14 +76,13 @@ export class PrivateCellNormal extends BaseCell {
     const oldValue = this.value;
     let calculatedValue: CellValue | null = null;
 
-    try {
+    // run calculate function
+    const cell = this;
+    await handleLogging(async () => {
+      if (!cell.calculate) return;
       const { get, set, update } = spreadsheet.getPublicFunctions(this);
-      calculatedValue = await this.calculate(oldValue, get, set, update);
-    }
-    catch (err) {
-      console.error(err);
-      // todo inform user of error they made
-    }
+      calculatedValue = await cell.calculate(oldValue, get, set, update);
+    }, "calculate", cell);
 
     this.value = calculatedValue ?? "";
 

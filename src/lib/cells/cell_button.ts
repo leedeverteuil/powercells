@@ -1,6 +1,7 @@
 import type { CellLocation } from "./cell_types";
 import { spreadsheet } from "../spreadsheet";
 import { BaseCell } from "./cell_base";
+import { handleLogging } from "../console";
 
 export type CellButtonStyle = "primary" | "secondary" | "destructive";
 
@@ -37,16 +38,14 @@ export class PrivateCellButton extends BaseCell {
   }
 
   async runAction() {
-    // no action function
-    if (!this.action) return;
+    const cell = this;
 
-    try {
+    await handleLogging(async () => {
+      // no action function
+      if (!cell.action) return;
+
       const { get, set, update } = spreadsheet.getPublicFunctions();
-      await this.action(get, set, update);
-    }
-    catch (err) {
-      console.error(err);
-      // todo inform user of error they made
-    }
+      await cell.action(get, set, update);
+    }, "action", this);
   }
 }

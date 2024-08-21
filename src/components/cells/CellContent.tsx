@@ -6,6 +6,7 @@ import { PrivateCellButton } from "@/lib/cells/cell_button";
 import { CellButton } from "../code_panel/CellButton";
 import { PrivateCellTimer } from "@/lib/cells/cell_timer";
 import { CellTimer } from "../code_panel/CellTimer";
+import { handleLoggingSync } from "@/lib/console";
 
 type Props = {
   cell: PrivateCell | null;
@@ -24,7 +25,7 @@ export const CellContent = ({ cell, location }: Props) => {
 
           // user wrote a formatter
           if (format) {
-            return <>{format(value)}</>;
+            return <>{handleLoggingSync(format, "format", cell)}</>;
           }
           // no formatter provided
           else {

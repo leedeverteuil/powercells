@@ -48,9 +48,6 @@ export const CalculateFunction = ({ cell }: Props) => {
   const saveChanges = () => {
     // save to cell
     cell.setCalculateFunction(buildCalculateFunction(inputFuncStr));
-
-    // re-calculate this cell
-    cell.runCalculate();
   };
 
   const handleRun = () => {
