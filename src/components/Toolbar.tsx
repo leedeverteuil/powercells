@@ -1,14 +1,16 @@
-import { BookText, Play, RefreshCcw, Settings } from "lucide-react";
+import { BookText, Play, RefreshCcw, Save, Settings } from "lucide-react";
 import { Button } from "./ui/button";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { SettingsDialog } from "./SettingsDialog";
-import { SpreadsheetContext } from "@/lib/spreadsheet";
+import { useToast } from "./ui/use-toast";
+import { useRenderSubscriber } from "@/lib/render_subscriber";
 
 const Toolbar = () => {
   const [isRecalculating, setIsRecalculating] = useState(false);
   const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
+  const { toast } = useToast();
 
-  const spreadsheet = useContext(SpreadsheetContext);
+  const { spreadsheet } = useRenderSubscriber(["tainted"]);
   if (!spreadsheet) return <></>;
 
   const recalculateAll = async () => {
@@ -17,6 +19,15 @@ const Toolbar = () => {
       await spreadsheet.recalculate();
       setIsRecalculating(false);
     }
+  };
+
+  const handleSave = () => {
+    const success = spreadsheet.saveToStorage();
+    toast({
+      title: success
+        ? "Saved sheet successfully"
+        : "Something went wrong saving sheet",
+    });
   };
 
   return (
@@ -33,7 +44,15 @@ const Toolbar = () => {
 
           {/* reset sheet */}
           <Button variant="secondary">
-            <RefreshCcw className="w-4 h-4 mr-2" /> Reset Sheet
+            <RefreshCcw className="w-4 h-4 mr-2" /> Reset
+          </Button>
+
+          {/* save sheet */}
+          <Button
+            disabled={!spreadsheet.tainted}
+            variant="secondary"
+            onClick={handleSave}>
+            <Save className="w-4 h-4 mr-2" /> Save
           </Button>
         </div>
 

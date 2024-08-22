@@ -135,7 +135,7 @@ export function parseCellLocationFromUserInput(col: string | number, row: number
   };
 }
 
-export function findCellAtLocation(grid: Cell[][], location: CellLocation): (Cell | null) {
+export function findCellAtLocation(grid: ((Cell | null)[] | null)[], location: CellLocation): (Cell | null) {
   const row = grid[location.row];
   if (row) {
     const cell = row[location.col]

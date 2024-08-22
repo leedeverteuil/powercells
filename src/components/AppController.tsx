@@ -1,13 +1,19 @@
 import { Spreadsheet, SpreadsheetContext } from "@/lib/spreadsheet";
-import DarkModeToggle from "../DarkModeToggle";
+import DarkModeToggle from "./DarkModeToggle";
 import { useEffect, useState } from "react";
-import Toolbar from "../Toolbar";
-import CellsGrid from "../CellsGrid";
-import Footer from "../Footer";
-import { CodePanel } from "./CodePanel";
+import Toolbar from "./Toolbar";
+import CellsGrid from "./CellsGrid";
+import Footer from "./Footer";
+import { CodePanel } from "./code_panel/CodePanel";
+import { Toaster } from "./ui/toaster";
+import { TaintedSpreadsheetDialog } from "./TaintedSpreadsheetDialog";
 
 const AppController = () => {
   const [spreadsheet, setSpreadsheet] = useState<Spreadsheet | null>(null);
+  const [taintedAlert, setTaintedAlert] = useState<{
+    open: boolean;
+    sheetKey: string | null;
+  }>({ open: false, sheetKey: null });
 
   // start with data cleaning
   useEffect(() => {
@@ -18,11 +24,22 @@ const AppController = () => {
   // init and destroy
   useEffect(() => {
     spreadsheet?.init();
-    // return spreadsheet?.destroy;
   }, [spreadsheet]);
 
   const handleSheetChange = (sheetKey: string) => {
-    setSpreadsheet(Spreadsheet.fromStorage(sheetKey));
+    if (spreadsheet && spreadsheet.tainted) {
+      setTaintedAlert({ open: true, sheetKey });
+    } else {
+      setSpreadsheet(Spreadsheet.fromStorage(sheetKey));
+    }
+  };
+
+  const handleConfirmDespiteTainted = () => {
+    const { sheetKey } = taintedAlert;
+    if (sheetKey) {
+      setSpreadsheet(Spreadsheet.fromStorage(sheetKey));
+      setTaintedAlert({ open: false, sheetKey: null });
+    }
   };
 
   return (
@@ -55,7 +72,10 @@ const AppController = () => {
 
           <Toolbar />
           <CellsGrid />
-          <Footer handleSheetChange={handleSheetChange} sheetKey={spreadsheet?.key ?? ""} />
+          <Footer
+            handleSheetChange={handleSheetChange}
+            sheetKey={spreadsheet?.key ?? ""}
+          />
         </section>
 
         {/* right side */}
@@ -63,6 +83,12 @@ const AppController = () => {
           <CodePanel />
         </section>
       </main>
+
+      <Toaster />
+      <TaintedSpreadsheetDialog
+        open={taintedAlert.open}
+        onClose={() => setTaintedAlert({ open: false, sheetKey: null })}
+        handleConfirm={handleConfirmDespiteTainted}></TaintedSpreadsheetDialog>
     </SpreadsheetContext.Provider>
   );
 };

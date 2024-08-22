@@ -36,7 +36,7 @@ export type CustomColSizes = {
 
 export type SpreadsheetSerialized = {
   key: string;
-  grid: CellSerialized[][];
+  grid: ((CellSerialized | null)[] | null)[];
   customColSizes: CustomColSizes;
 };
 
@@ -53,9 +53,10 @@ export const SpreadsheetContext = createContext<Spreadsheet | null>(null);
 export class Spreadsheet {
   key: string;
   selectedLocation: CellLocation | null = null;
-  grid: Cell[][] = [];
+  grid: ((Cell | null)[] | null)[] = [];
   subscriberRecords: SpreadsheetSubscriberRecord[] = [];
   customColSizes: CustomColSizes = {};
+  tainted: boolean = false;
 
   constructor(key: string) {
     this.key = key;
@@ -68,7 +69,9 @@ export class Spreadsheet {
   serialize(): SpreadsheetSerialized {
     // convert to serialized cells
     const convertedGrid = this.grid.map(row => {
-      return row.map(cell => cell.serialize());
+      return row ? row.map(cell => {
+        return cell ? cell.serialize() : null;
+      }) : null;
     });
 
     return {
@@ -79,18 +82,31 @@ export class Spreadsheet {
   }
 
   static fromSerialized(serialized: SpreadsheetSerialized): Spreadsheet {
+    console.log(serialized);
+
+
     const { grid, customColSizes, key } = serialized;
     const spreadsheet = new Spreadsheet(key);
 
     spreadsheet.customColSizes = customColSizes;
     spreadsheet.grid = grid.map(row => {
-      return row.map((serializedCell) => {
-        const type = serializedCell.type;
-        if (type === "normal") { return CellNormal.fromSerialized(spreadsheet, serializedCell); }
-        if (type === "button") { return CellButton.fromSerialized(spreadsheet, serializedCell); }
-        if (type === "timer") { return CellTimer.fromSerialized(spreadsheet, serializedCell); }
-        throw new Error("Failed to build spreadsheet from serialized data.");
-      });
+      if (row) {
+        return row.map((serializedCell) => {
+          if (serializedCell) {
+            const type = serializedCell.type;
+            if (type === "normal") { return CellNormal.fromSerialized(spreadsheet, serializedCell); }
+            if (type === "button") { return CellButton.fromSerialized(spreadsheet, serializedCell); }
+            if (type === "timer") { return CellTimer.fromSerialized(spreadsheet, serializedCell); }
+            throw new Error("Failed to build spreadsheet from serialized data.");
+          }
+          else {
+            return null;
+          }
+        });
+      }
+      else {
+        return null;
+      }
     });
 
     return spreadsheet;
@@ -98,19 +114,29 @@ export class Spreadsheet {
 
   saveToStorage() {
     try {
-      const json = JSON.parse(localStorage.getItem("spreadsheetSaves") ?? "{}");
+      const item = localStorage.getItem("spreadsheetSaves");
+      const json = JSON.parse(item || "{}");
       json[this.key] = this.serialize();
-      localStorage.setItem("spreadsheetSaves", json);
+      localStorage.setItem("spreadsheetSaves", JSON.stringify(json));
+
+      // for disabling save button, and
+      // stop showing warning message when
+      // switching sheets
+      this.tainted = false;
+
+      return true;
     }
     catch (err) {
       console.error(err);
+      return false;
     }
   }
 
   static fromStorage(key: string): Spreadsheet {
     let obj: SpreadsheetSerialized | null = null;
     try {
-      const json = JSON.parse(localStorage.getItem("spreadsheetSaves") ?? "{}");
+      const item = localStorage.getItem("spreadsheetSaves");
+      const json = JSON.parse(item || "{}");
       obj = json[key];
     }
     catch (err) {
@@ -153,7 +179,7 @@ export class Spreadsheet {
 
       // make row if not already made
       let gridRow = grid[row];
-      if (gridRow === undefined) {
+      if (!gridRow) {
         grid[row] = [];
         gridRow = grid[row];
       }
@@ -180,7 +206,7 @@ export class Spreadsheet {
 
       // make row if not already made
       let gridRow = grid[row];
-      if (gridRow === undefined) {
+      if (!gridRow) {
         grid[row] = [];
         gridRow = grid[row];
       }
@@ -201,6 +227,8 @@ export class Spreadsheet {
   }
 
   handleCellChangeAsync(changedCell: Cell) {
+    this.tainted = true;
+
     this.handleCellChange(changedCell, [])
       .then()
       .catch(err => {
@@ -209,7 +237,9 @@ export class Spreadsheet {
   }
 
   async handleCellChange(changedCell: Cell, updateChain: string[] = []) {
-    this.updateSubscribers([getLocationId(changedCell.location), "grid"]);
+    this.tainted = true;
+
+    this.updateSubscribers([getLocationId(changedCell.location), "grid", "tainted"]);
 
     // any cells that depend on changed cell should recalculate
     if (changedCell instanceof CellNormal) {
@@ -364,9 +394,19 @@ export class Spreadsheet {
   }
 
   private getAllCells(): Cell[] {
-    return this.grid.reduce((acc, row) => {
-      return [...acc, ...(row ?? [])];
-    }, []);
+    const cells: Cell[] = []
+
+    for (const row of this.grid) {
+      if (row) {
+        for (const cell of row) {
+          if (cell) {
+            cells.push(cell);
+          }
+        }
+      }
+    }
+
+    return cells;
   }
 
   private getCalculateOrder(): CellNormal[] {
