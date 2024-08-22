@@ -7,11 +7,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "./ui/button";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { settings } from "@/lib/settings";
-import { spreadsheet } from "@/lib/spreadsheet";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
+import { SpreadsheetContext } from "@/lib/spreadsheet";
 
 type Props = {
   open: boolean;
@@ -22,6 +22,9 @@ export const SettingsDialog = ({ open, onClose }: Props) => {
   const [useColumnNumbers, setUseColumnNumbers] = useState(
     settings.useColumnNumbers
   );
+
+  const spreadsheet = useContext(SpreadsheetContext);
+  if (!spreadsheet) return <></>;
 
   useEffect(() => {
     // reset use column numbers when opening

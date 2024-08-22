@@ -1,6 +1,6 @@
-import type { CellButton } from "./cell_button";
-import type { CellNormal } from "./cell_normal";
-import type { CellTimer } from "./cell_timer";
+import type { CellButton, CellButtonSerialized } from "./cell_button";
+import type { CellNormal, CellNormalSerialized } from "./cell_normal";
+import type { CellTimer, CellTimerSerialized } from "./cell_timer";
 
 export type CellLocation = {
   row: number;
@@ -18,4 +18,6 @@ export type CellStyle = {
 };
 
 export type Cell = CellNormal | CellButton | CellTimer;
+
+export type CellSerialized = CellNormalSerialized | CellButtonSerialized | CellTimerSerialized;
 

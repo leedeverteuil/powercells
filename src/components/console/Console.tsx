@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/tooltip";
 
 export const Console = () => {
-  useRenderSubscriber(["console"]);
+  const { spreadsheet } = useRenderSubscriber(["console"]);
+  if (!spreadsheet) return;
 
   return (
     <div className="relative h-48 p-3 space-y-2 overflow-y-auto border rounded-md bg-zinc-950 border-zinc-950 dark:border-zinc-800">
@@ -23,7 +24,7 @@ export const Console = () => {
             <Button
               variant="outline"
               size="icon"
-              onClick={clearConsole}
+              onClick={() => clearConsole(spreadsheet)}
               className="absolute top-2 right-2">
               <Eraser className="w-4 h-4" />
             </Button>

@@ -1,6 +1,6 @@
 import type { CellButton } from "@/lib/cells/cell_button";
 import { getLocationId } from "@/lib/cells/cells_util";
-import { buildButtonActionFunction, getFunctionBody } from "@/lib/code_editor";
+import { buildActionFunction, getFunctionBody } from "@/lib/code_editor";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
 import { useEffect, useState } from "react";
 import { Label } from "../ui/label";
@@ -20,7 +20,7 @@ export const ActionFunction = ({ cell }: Props) => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [funcStr, setFuncStr] = useState("");
   const [inputFuncStr, setInputFuncStr] = useState("");
-  const renderTs = useRenderSubscriber([getLocationId(cell.location)]);
+  const { lastRenderTs } = useRenderSubscriber([getLocationId(cell.location)]);
 
   useEffect(() => {
     const oldFuncStr = funcStr;
@@ -33,13 +33,13 @@ export const ActionFunction = ({ cell }: Props) => {
     if (oldFuncStr !== newFuncStr) {
       setInputFuncStr(newFuncStr);
     }
-  }, [renderTs]);
+  }, [lastRenderTs]);
 
   const hasAction = cell.action !== null;
   const isFuncDifferent = inputFuncStr !== funcStr;
 
   const addActionFunc = () => {
-    cell.setActionFunction(buildButtonActionFunction(exampleFunctionString));
+    cell.setActionFunction(buildActionFunction(exampleFunctionString));
   };
 
   const onInput = (value: string) => {
@@ -48,7 +48,7 @@ export const ActionFunction = ({ cell }: Props) => {
 
   const saveChanges = () => {
     // save to cell
-    cell.setActionFunction(buildButtonActionFunction(inputFuncStr));
+    cell.setActionFunction(buildActionFunction(inputFuncStr));
   };
 
   const openDeleteDialog = () => {

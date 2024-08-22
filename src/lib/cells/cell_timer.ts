@@ -1,7 +1,17 @@
 import type { CellLocation } from "./cell_types";
-import { spreadsheet } from "../spreadsheet";
 import { BaseCell } from "./cell_base";
 import { handleLogging } from "../console";
+import { buildActionFunction, getFunctionBody } from "../code_editor";
+import { Spreadsheet, SpreadsheetContext } from "../spreadsheet";
+
+export type CellTimerSerialized = {
+  type: "timer";
+  location: CellLocation;
+  label: string;
+  loopTimeMs: number;
+  paused: boolean;
+  action: string | null;
+};
 
 const MIN_LOOP_TIME_MS = 500;
 
@@ -14,6 +24,7 @@ export class CellTimer extends BaseCell {
   unbindFunc: Function | null = null;
 
   constructor(
+    spreadsheet: Spreadsheet,
     location: CellLocation,
     label: string = "Timer",
     loopTimeMs: number = 5000,
@@ -21,7 +32,7 @@ export class CellTimer extends BaseCell {
     paused: boolean = false,
     action: Function | null = null
   ) {
-    super(location);
+    super(spreadsheet, location);
     this.label = label;
     this.loopTimeMs = loopTimeMs;
     this.lastRunMs = lastRunMs;
@@ -29,14 +40,39 @@ export class CellTimer extends BaseCell {
     this.setPaused(paused);
   }
 
+  serialize(): CellTimerSerialized {
+    const { location, label, loopTimeMs, paused, action } = this;
+
+    return {
+      type: "timer",
+      location, label, loopTimeMs, paused,
+      action: action ? getFunctionBody(action) : null
+    };
+  };
+
+  static fromSerialized(spreadsheet: Spreadsheet, serialized: CellTimerSerialized): CellTimer {
+    const { location, label, loopTimeMs, paused, action } = serialized;
+    const cell = new CellTimer(
+      spreadsheet,
+      location,
+      label,
+      loopTimeMs,
+      Date.now(),
+      paused,
+      action ? buildActionFunction(action) : null
+    );
+
+    return cell;
+  }
+
   setLabel(label: string) {
     this.label = label;
-    spreadsheet.handleCellChangeAsync(this);
+    this.callHandleCellChangeAsync();
   }
 
   setLoopTimeMs(loopTimeMs: number) {
     this.loopTimeMs = Math.max(MIN_LOOP_TIME_MS, loopTimeMs);
-    spreadsheet.handleCellChangeAsync(this);
+    this.callHandleCellChangeAsync();
 
     // rebind interval if running
     this.setPaused(this.paused);
@@ -68,12 +104,12 @@ export class CellTimer extends BaseCell {
       };
     }
 
-    spreadsheet.handleCellChangeAsync(this);
+    this.callHandleCellChangeAsync();
   }
 
   setActionFunction(func: Function | null) {
     this.action = func;
-    spreadsheet.handleCellChangeAsync(this);
+    this.callHandleCellChangeAsync();
   }
 
   async runAction() {
@@ -83,7 +119,7 @@ export class CellTimer extends BaseCell {
       // no action function
       if (!cell.action) return;
 
-      const { get, set, update } = spreadsheet.getPublicFunctions();
+      const { get, set, update } = this.spreadsheet.getPublicFunctions();
       await cell.action(get, set, update);
     }, "action", this);
   }

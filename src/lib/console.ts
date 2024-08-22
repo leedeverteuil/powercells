@@ -1,6 +1,6 @@
 import type { Cell } from "./cells/cell_types";
-import { spreadsheet } from "./spreadsheet";
 import { getUniqueId } from "./utils";
+import type { Spreadsheet } from "./spreadsheet";
 
 export type FunctionType = "calculate" | "action" | "format" | "saveAction" | "saveCalculate" | "saveFormat";
 
@@ -14,12 +14,12 @@ export type LogError = {
 
 export let log: LogError[] = [];
 
-export function clearConsole() {
+export function clearConsole(spreadsheet: Spreadsheet) {
   log = [];
   spreadsheet.updateSubscribers(["console"]);
 }
 
-function addLogError(error: any, functionType: FunctionType, cell: Cell) {
+function addLogError(error: any, functionType: FunctionType, cell: Cell, spreadsheet: Spreadsheet) {
   if (error instanceof Error) {
     spreadsheet.updateSubscribers(["console"]);
 
@@ -36,19 +36,23 @@ function addLogError(error: any, functionType: FunctionType, cell: Cell) {
 }
 
 export async function handleLogging(func: Function, functionType: FunctionType, cell: Cell) {
+  const spreadsheet = cell.spreadsheet;
+
   try {
     await func();
   }
   catch (error) {
-    addLogError(error, functionType, cell);
+    addLogError(error, functionType, cell, spreadsheet);
   }
 }
 
 export function handleLoggingSync(func: Function, functionType: FunctionType, cell: Cell) {
+  const spreadsheet = cell.spreadsheet;
+
   try {
     return func();
   }
   catch (error) {
-    addLogError(error, functionType, cell);
+    addLogError(error, functionType, cell, spreadsheet);
   }
 }

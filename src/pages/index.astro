@@ -1,9 +1,7 @@
 ---
 import "@/styles/globals.css";
 import Layout from "../layouts/Layout.astro";
-import DarkModeToggle from "@/components/DarkModeToggle";
-import Spreadsheet from "@/components/Spreadsheet";
-import { CodePanel } from "@/components/code_panel/CodePanel";
+import AppController from "@/components/code_panel/AppController";
 ---
 
 <!-- for dark mode -->
@@ -32,39 +30,5 @@ import { CodePanel } from "@/components/code_panel/CodePanel";
 </script>
 
 <Layout title="Powercells">
-  <main class="h-screen max-w-full overflow-hidden bg-white dark:bg-zinc-950">
-    <!-- left side -->
-    <section class="overflow-hidden max-w-[calc(100%-27rem)]">
-      <!-- header -->
-      <header class="flex items-center justify-between p-5 pb-3">
-        <div class="space-y-0.5">
-          <img
-            src="/logo-light.svg"
-            alt="powercells.js"
-            class="block h-6 dark:hidden"
-          />
-          <img
-            src="/logo-dark.svg"
-            alt="powercells.js"
-            class="hidden h-6 dark:block"
-          />
-          <p class="text-sm text-zinc-500">
-            Spreadsheet empowered with JavaScript <span
-              class="text-xs text-zinc-400 dark:text-zinc-600">(prototype)</span
-            >
-          </p>
-        </div>
-
-        <DarkModeToggle client:only="react" />
-      </header>
-
-      <Spreadsheet client:only="react" />
-    </section>
-
-    <!-- right side -->
-    <section
-      class="fixed right-0 top-0 w-[27rem] h-full border-l border-colors">
-      <CodePanel client:only="react" />
-    </section>
-  </main>
+  <AppController client:only="react" />
 </Layout>

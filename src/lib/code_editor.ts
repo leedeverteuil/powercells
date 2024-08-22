@@ -46,7 +46,7 @@ export function buildFormatFunction(funcStr: string): Function {
   return Function("value", funcStr) as Function;
 }
 
-export function buildButtonActionFunction(funcStr: string): Function {
+export function buildActionFunction(funcStr: string): Function {
   return AsyncFunction("get", "set", "update", funcStr) as Function;
 }
 

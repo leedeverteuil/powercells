@@ -1,6 +1,5 @@
 import type { CellLocation } from "@/lib/cells/cell_types";
 import { CellContent } from "./CellContent";
-import { spreadsheet } from "@/lib/spreadsheet";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
 import {
   areLocationsEqual,
@@ -8,11 +7,16 @@ import {
   getLocationId,
 } from "@/lib/cells/cells_util";
 import { CellNormal } from "@/lib/cells/cell_normal";
+import { useContext } from "react";
+import { SpreadsheetContext } from "@/lib/spreadsheet";
 
 type Props = {
   location: CellLocation;
 };
 export const ContentCell = ({ location }: Props) => {
+  const spreadsheet = useContext(SpreadsheetContext);
+  if (!spreadsheet) return <></>;
+
   const cell = findCellAtLocation(spreadsheet.grid, location);
   const { col } = location;
   const selected =

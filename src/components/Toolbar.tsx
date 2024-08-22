@@ -1,12 +1,15 @@
 import { BookText, Play, RefreshCcw, Settings } from "lucide-react";
 import { Button } from "./ui/button";
-import { spreadsheet } from "@/lib/spreadsheet";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { SettingsDialog } from "./SettingsDialog";
+import { SpreadsheetContext } from "@/lib/spreadsheet";
 
 const Toolbar = () => {
   const [isRecalculating, setIsRecalculating] = useState(false);
   const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
+
+  const spreadsheet = useContext(SpreadsheetContext);
+  if (!spreadsheet) return <></>;
 
   const recalculateAll = async () => {
     if (!isRecalculating) {
@@ -29,8 +32,7 @@ const Toolbar = () => {
           </Button>
 
           {/* reset sheet */}
-          <Button
-            variant="secondary">
+          <Button variant="secondary">
             <RefreshCcw className="w-4 h-4 mr-2" /> Reset Sheet
           </Button>
         </div>

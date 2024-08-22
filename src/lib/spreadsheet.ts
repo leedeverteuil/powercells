@@ -1,6 +1,10 @@
+import { createContext } from "react";
+import { CellButton } from "./cells/cell_button";
 import { CellNormal } from "./cells/cell_normal";
-import type { CellLocation, CellType, CellValue, Cell } from "./cells/cell_types";
+import { CellTimer } from "./cells/cell_timer";
+import type { CellLocation, CellType, CellValue, Cell, CellSerialized } from "./cells/cell_types";
 import { findCellAtLocation, getConstructorForCellType, getLocationId, parseLocationQuery } from "./cells/cells_util";
+import { defaultSheets } from "./spreadsheet_defaults";
 
 // constants
 const DEFAULT_COL_WIDTH = 120;
@@ -30,10 +34,11 @@ export type CustomColSizes = {
   [col: number]: number;
 };
 
-// export type SpreadsheetSerialized = {
-//   grid: CellSerialized[][];
-//   customColSizes: CustomColSizes;
-// };
+export type SpreadsheetSerialized = {
+  key: string;
+  grid: CellSerialized[][];
+  customColSizes: CustomColSizes;
+};
 
 // constants
 export const letters = [
@@ -42,29 +47,82 @@ export const letters = [
   "u", "v", "w", "x", "y", "z"
 ];
 
+// context
+export const SpreadsheetContext = createContext<Spreadsheet | null>(null);
+
 export class Spreadsheet {
+  key: string;
   selectedLocation: CellLocation | null = null;
   grid: Cell[][] = [];
   subscriberRecords: SpreadsheetSubscriberRecord[] = [];
   customColSizes: CustomColSizes = {};
 
+  constructor(key: string) {
+    this.key = key;
+  }
+
   init() {
     this.recalculate().then().catch(console.error);
   }
 
-  destroy() {
-    // todo
-    console.log("destroying spreadsheet");
+  serialize(): SpreadsheetSerialized {
+    // convert to serialized cells
+    const convertedGrid = this.grid.map(row => {
+      return row.map(cell => cell.serialize());
+    });
+
+    return {
+      key: this.key,
+      grid: convertedGrid,
+      customColSizes: this.customColSizes
+    };
   }
 
-  // serialize(): SpreadsheetSerialized {
-  //   // convert to serialized cells
+  static fromSerialized(serialized: SpreadsheetSerialized): Spreadsheet {
+    const { grid, customColSizes, key } = serialized;
+    const spreadsheet = new Spreadsheet(key);
 
+    spreadsheet.customColSizes = customColSizes;
+    spreadsheet.grid = grid.map(row => {
+      return row.map((serializedCell) => {
+        const type = serializedCell.type;
+        if (type === "normal") { return CellNormal.fromSerialized(spreadsheet, serializedCell); }
+        if (type === "button") { return CellButton.fromSerialized(spreadsheet, serializedCell); }
+        if (type === "timer") { return CellTimer.fromSerialized(spreadsheet, serializedCell); }
+        throw new Error("Failed to build spreadsheet from serialized data.");
+      });
+    });
 
-  //   return {
+    return spreadsheet;
+  }
 
-  //   };
-  // }
+  saveToStorage() {
+    try {
+      const json = JSON.parse(localStorage.getItem("spreadsheetSaves") ?? "{}");
+      json[this.key] = this.serialize();
+      localStorage.setItem("spreadsheetSaves", json);
+    }
+    catch (err) {
+      console.error(err);
+    }
+  }
+
+  static fromStorage(key: string): Spreadsheet {
+    let obj: SpreadsheetSerialized | null = null;
+    try {
+      const json = JSON.parse(localStorage.getItem("spreadsheetSaves") ?? "{}");
+      obj = json[key];
+    }
+    catch (err) {
+      console.error(err);
+    }
+
+    if (!obj) {
+      obj = defaultSheets[key];
+    }
+
+    return Spreadsheet.fromSerialized(obj);
+  }
 
   /** @returns unsubscribe function */
   subscribe(func: SpreadsheetSubscriber, dependencies: string[]): () => void {
@@ -86,6 +144,7 @@ export class Spreadsheet {
   setCellType(location: CellLocation, type: CellType) {
     const existingCell = findCellAtLocation(this.grid, location);
     const cellConstructor = getConstructorForCellType(type);
+    if (!cellConstructor) return;
 
     if (!existingCell || existingCell.constructor !== cellConstructor) {
       // need to create button cell
@@ -99,7 +158,7 @@ export class Spreadsheet {
         gridRow = grid[row];
       }
 
-      const newCell = new cellConstructor(location);
+      const newCell = new cellConstructor(this, location);
       gridRow[col] = newCell;
 
       this.handleCellChangeAsync(newCell);
@@ -126,7 +185,7 @@ export class Spreadsheet {
         gridRow = grid[row];
       }
 
-      const newCell = new CellNormal(location, "");
+      const newCell = new CellNormal(this, location, "");
       gridRow[col] = newCell;
 
       return newCell;
@@ -154,7 +213,7 @@ export class Spreadsheet {
 
     // any cells that depend on changed cell should recalculate
     if (changedCell instanceof CellNormal) {
-      for (const row of spreadsheet.grid) {
+      for (const row of this.grid) {
         if (Array.isArray(row)) {
           for (const cell of row) {
             if (cell && cell instanceof CellNormal && cell.dependencies.includes(changedCell)) {
@@ -275,10 +334,6 @@ export class Spreadsheet {
         if (r instanceof CellNormal) {
           r.setValue(value);
         }
-        else {
-          // todo console warning to user that they are trying
-          // to update a widget
-        }
       }
     };
 
@@ -288,10 +343,6 @@ export class Spreadsheet {
       for (const r of results) {
         if (r instanceof CellNormal) {
           r.setValue(handler(r.value));
-        }
-        else {
-          // todo console warning to user that they are trying
-          // to update a widget
         }
       }
     };
@@ -351,5 +402,3 @@ export class Spreadsheet {
     return order;
   }
 }
-
-export const spreadsheet = new Spreadsheet();

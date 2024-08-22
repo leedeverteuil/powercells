@@ -26,14 +26,16 @@ export function getConstructorForCellType(type: CellType) {
   if (type === "normal") return CellNormal;
   if (type === "button") return CellButton;
   if (type === "timer") return CellTimer;
-  throw new Error("Invalid cell type");
+
+  return null;
 }
 
-export function getCellTypeFromConstructor(constructor: Function): CellType {
+export function getCellTypeFromConstructor(constructor: Function): CellType | null {
   if (constructor === CellNormal) return "normal";
   if (constructor === CellButton) return "button";
   if (constructor === CellTimer) return "timer";
-  throw new Error("Invalid constructor (bug)");
+
+  return null;
 }
 
 export function getLocationId(location: CellLocation) {

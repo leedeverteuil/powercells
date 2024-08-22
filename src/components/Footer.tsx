@@ -5,10 +5,14 @@ import { useEffect, useRef, useState } from "react";
 import { Separator } from "./ui/separator";
 import { Button } from "./ui/button";
 
-const Footer = () => {
-  const [tab, setTab] = useState("sheets");
+type Props = {
+  sheetKey: string;
+  handleSheetChange: (sheetKey: string) => void;
+};
 
-  const lastUpdateTs = useRenderSubscriber(["console"]);
+const Footer = ({ handleSheetChange, sheetKey }: Props) => {
+  const [tab, setTab] = useState("sheets");
+  const { lastRenderTs } = useRenderSubscriber(["console"]);
   const firstUpdate = useRef(true);
 
   // switch to console when new errors come up
@@ -21,7 +25,7 @@ const Footer = () => {
     if (tab !== "console") {
       setTab("console");
     }
-  }, [lastUpdateTs]);
+  }, [lastRenderTs]);
 
   const onTabChanged = (tab: string) => {
     setTab(tab);
@@ -37,13 +41,29 @@ const Footer = () => {
         {/* all example sheets will be visible here */}
         <TabsContent value="sheets" className="mb-2">
           <div className="flex items-center h-5 space-x-1 text-sm">
-            <Button variant="ghost">Data Cleaning</Button>
+            <Button
+              onClick={() => handleSheetChange("dataCleaning")}
+              variant={sheetKey === "dataCleaning" ? "secondary" : "ghost"}>
+              Data Cleaning
+            </Button>
             <Separator orientation="vertical" />
-            <Button variant="ghost">Weather API</Button>
+            <Button
+              onClick={() => handleSheetChange("weatherApi")}
+              variant={sheetKey === "weatherApi" ? "secondary" : "ghost"}>
+              Weather API
+            </Button>
             <Separator orientation="vertical" />
-            <Button variant="ghost">Game of Life</Button>
+            <Button
+              onClick={() => handleSheetChange("gameOfLife")}
+              variant={sheetKey === "gameOfLife" ? "secondary" : "ghost"}>
+              Game of Life
+            </Button>
             <Separator orientation="vertical" />
-            <Button variant="ghost">Blank</Button>
+            <Button
+              onClick={() => handleSheetChange("blank")}
+              variant={sheetKey === "blank" ? "secondary" : "ghost"}>
+              Blank
+            </Button>
           </div>
         </TabsContent>
 

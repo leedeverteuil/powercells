@@ -19,7 +19,7 @@ export const CalculateFunction = ({ cell }: Props) => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [funcStr, setFuncStr] = useState("");
   const [inputFuncStr, setInputFuncStr] = useState("");
-  const renderTs = useRenderSubscriber([getLocationId(cell.location)]);
+  const { lastRenderTs } = useRenderSubscriber([getLocationId(cell.location)]);
 
   useEffect(() => {
     const oldFuncStr = funcStr;
@@ -32,7 +32,7 @@ export const CalculateFunction = ({ cell }: Props) => {
     if (oldFuncStr !== newFuncStr) {
       setInputFuncStr(newFuncStr);
     }
-  }, [renderTs]);
+  }, [lastRenderTs]);
 
   const hasCalculate = cell.calculate !== null;
   const isFuncDifferent = inputFuncStr !== funcStr;

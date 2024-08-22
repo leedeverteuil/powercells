@@ -6,7 +6,6 @@ import {
 } from "@/lib/cells/cells_util";
 import { Ban } from "lucide-react";
 import { Button } from "../ui/button";
-import { spreadsheet } from "@/lib/spreadsheet";
 import { CellTypeSelect } from "./CellTypeSelect";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
 import { CellNormalFields } from "./CellNormalFields";
@@ -21,10 +20,14 @@ type Props = {
 };
 
 export const CellEditor = ({ location }: Props) => {
-  useRenderSubscriber([getLocationId(location)]);
+  const { spreadsheet } = useRenderSubscriber([getLocationId(location)]);
+  if (!spreadsheet) return <></>;
 
   const displayName = getLocationDisplayName(location);
   const cell = spreadsheet.getCell(location);
+
+  const cellType = getCellTypeFromConstructor(cell.constructor);
+  if (!cellType) return <></>;
 
   return (
     // selected location
@@ -46,7 +49,7 @@ export const CellEditor = ({ location }: Props) => {
       <div className="px-5 py-3 space-y-5">
         {/* cell type editor */}
         <CellTypeSelect
-          value={getCellTypeFromConstructor(cell.constructor)}
+          value={cellType}
           onValueChange={(value) => {
             if (value) {
               spreadsheet.setCellType(location, value as CellType);

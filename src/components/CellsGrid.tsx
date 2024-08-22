@@ -1,5 +1,5 @@
 import { TOTAL_NUM_ROWS } from "@/lib/config";
-import { letters, spreadsheet } from "@/lib/spreadsheet";
+import { letters } from "@/lib/spreadsheet";
 import { type ReactElement } from "react";
 import RowLabelCell from "./cells/RowLabelCell";
 import { HeaderLabelCell } from "./cells/HeaderLabelCell";
@@ -8,7 +8,8 @@ import { useRenderSubscriber } from "@/lib/render_subscriber";
 import type { CellLocation } from "@/lib/cells/cell_types";
 
 const CellsGrid = () => {
-  useRenderSubscriber(["grid", "columnSizes"]);
+  const { spreadsheet } = useRenderSubscriber(["grid", "columnSizes"]);
+  if (!spreadsheet) return <></>;
 
   const gridStyle = {
     gridTemplateColumns: spreadsheet.getGridTemplateColumns(),

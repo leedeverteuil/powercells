@@ -1,12 +1,11 @@
 import { useRenderSubscriber } from "@/lib/render_subscriber";
-import { spreadsheet } from "@/lib/spreadsheet";
 import { Code } from "lucide-react";
 import { CellEditor } from "./CellEditor";
 import { getLocationId } from "@/lib/cells/cells_util";
 
-type Props = {};
-export const CodePanel = ({}: Props) => {
-  useRenderSubscriber(["selectedLocation"]);
+export const CodePanel = () => {
+  const { spreadsheet } = useRenderSubscriber(["selectedLocation"]);
+  if (!spreadsheet) return <></>;
 
   const selectedLocation = spreadsheet.selectedLocation;
 
