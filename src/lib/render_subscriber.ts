@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { spreadsheet } from "./spreadsheet";
-import type { PrivateCell } from "./cells/cell_types";
+import type { Cell } from "./cells/cell_types";
 
-export function useRenderSubscriber(deps: string[], requiresCell?: boolean, cell?: PrivateCell | null) {
+export function useRenderSubscriber(deps: string[], requiresCell?: boolean, cell?: Cell | null) {
   const [lastRenderTs, setRenderTs] = useState(0);
 
   useEffect(() => {

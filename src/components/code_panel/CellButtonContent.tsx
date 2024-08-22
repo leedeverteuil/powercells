@@ -1,16 +1,16 @@
 import type {
+  CellButton,
   CellButtonStyle,
-  PrivateCellButton,
 } from "@/lib/cells/cell_button";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
 type Props = {
-  cell: PrivateCellButton;
+  cell: CellButton;
 };
 
-export const CellButton = ({ cell }: Props) => {
+export const CellButtonContent = ({ cell }: Props) => {
   const [loading, setLoading] = useState(false);
 
   const onClick = async () => {

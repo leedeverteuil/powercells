@@ -1,10 +1,10 @@
-import type { PrivateCellButton } from "@/lib/cells/cell_button";
+import type { CellButton } from "@/lib/cells/cell_button";
 import { CellLabelInput } from "./CellLabelInput";
 import { CellButtonStyleSelect } from "./CellButtonStyleSelect";
 import { ActionFunction } from "./ActionFunction";
 
 interface Props {
-  cell: PrivateCellButton;
+  cell: CellButton;
 }
 
 export function CellButtonFields({ cell }: Props) {

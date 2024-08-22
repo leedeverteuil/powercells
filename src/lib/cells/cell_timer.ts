@@ -5,7 +5,7 @@ import { handleLogging } from "../console";
 
 const MIN_LOOP_TIME_MS = 500;
 
-export class PrivateCellTimer extends BaseCell {
+export class CellTimer extends BaseCell {
   label: string;
   loopTimeMs: number;
   lastRunMs: number;

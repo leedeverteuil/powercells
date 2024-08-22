@@ -1,4 +1,4 @@
-import type { PrivateCellButton } from "@/lib/cells/cell_button";
+import type { CellButton } from "@/lib/cells/cell_button";
 import { getLocationId } from "@/lib/cells/cells_util";
 import { buildButtonActionFunction, getFunctionBody } from "@/lib/code_editor";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
@@ -8,10 +8,10 @@ import { CodeTextArea } from "./CodeTextArea";
 import { Button } from "../ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { DeleteFunctionDialog } from "./DeleteFunctionDialog";
-import type { PrivateCellTimer } from "@/lib/cells/cell_timer";
+import type { CellTimer } from "@/lib/cells/cell_timer";
 
 type Props = {
-  cell: PrivateCellButton | PrivateCellTimer;
+  cell: CellButton | CellTimer;
 };
 
 const exampleFunctionString = `// do some stuff`;

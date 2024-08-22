@@ -1,4 +1,4 @@
-import type { PrivateCellNormal } from "@/lib/cells/cell_normal";
+import type { CellNormal } from "@/lib/cells/cell_normal";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { Play, Plus, Trash2 } from "lucide-react";
@@ -10,7 +10,7 @@ import { buildCalculateFunction, getFunctionBody } from "@/lib/code_editor";
 import { DeleteFunctionDialog } from "./DeleteFunctionDialog";
 
 type Props = {
-  cell: PrivateCellNormal;
+  cell: CellNormal;
 };
 
 const exampleFunctionString = `return value + 5;`;

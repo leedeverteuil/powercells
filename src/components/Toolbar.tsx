@@ -1,4 +1,4 @@
-import { BookText, Play, Settings } from "lucide-react";
+import { BookText, Play, RefreshCcw, Settings } from "lucide-react";
 import { Button } from "./ui/button";
 import { spreadsheet } from "@/lib/spreadsheet";
 import { useState } from "react";
@@ -18,24 +18,36 @@ const Toolbar = () => {
 
   return (
     <>
-      <div className="flex items-center justify-start gap-2 px-5 pb-4 border-b border-colors">
-        {/* recalculate all */}
-        <Button
-          disabled={isRecalculating}
-          onClick={recalculateAll}
-          variant="secondary">
-          <Play className="w-4 h-4 mr-2" /> Recalculate All
-        </Button>
+      <div className="flex items-center justify-between gap-2 px-5 pb-4 border-b border-colors">
+        <div className="flex items-center justify-start gap-2">
+          {/* recalculate all */}
+          <Button
+            disabled={isRecalculating}
+            onClick={recalculateAll}
+            variant="secondary">
+            <Play className="w-4 h-4 mr-2" /> Recalculate All
+          </Button>
 
-        {/* open docs */}
-        <Button variant="secondary">
-          <BookText className="w-4 h-4 mr-2" /> Show Docs
-        </Button>
+          {/* reset sheet */}
+          <Button
+            variant="secondary">
+            <RefreshCcw className="w-4 h-4 mr-2" /> Reset Sheet
+          </Button>
+        </div>
 
-        {/* open settings */}
-        <Button onClick={() => setSettingsDialogOpen(true)} variant="secondary">
-          <Settings className="w-4 h-4 mr-2" /> Settings
-        </Button>
+        <div className="flex items-center justify-start gap-2">
+          {/* open docs */}
+          <Button variant="secondary">
+            <BookText className="w-4 h-4 mr-2" /> Show Docs
+          </Button>
+
+          {/* open settings */}
+          <Button
+            onClick={() => setSettingsDialogOpen(true)}
+            variant="secondary">
+            <Settings className="w-4 h-4 mr-2" /> Settings
+          </Button>
+        </div>
       </div>
 
       <SettingsDialog

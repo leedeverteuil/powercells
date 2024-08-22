@@ -1,4 +1,4 @@
-import type { PrivateCell } from "./cells/cell_types";
+import type { Cell } from "./cells/cell_types";
 import { spreadsheet } from "./spreadsheet";
 import { getUniqueId } from "./utils";
 
@@ -8,7 +8,7 @@ export type LogError = {
   key: string;
   error: Error;
   timestamp: number;
-  cell: PrivateCell;
+  cell: Cell;
   functionType: FunctionType;
 };
 
@@ -19,7 +19,7 @@ export function clearConsole() {
   spreadsheet.updateSubscribers(["console"]);
 }
 
-function addLogError(error: any, functionType: FunctionType, cell: PrivateCell) {
+function addLogError(error: any, functionType: FunctionType, cell: Cell) {
   if (error instanceof Error) {
     spreadsheet.updateSubscribers(["console"]);
 
@@ -35,7 +35,7 @@ function addLogError(error: any, functionType: FunctionType, cell: PrivateCell) 
   }
 }
 
-export async function handleLogging(func: Function, functionType: FunctionType, cell: PrivateCell) {
+export async function handleLogging(func: Function, functionType: FunctionType, cell: Cell) {
   try {
     await func();
   }
@@ -44,7 +44,7 @@ export async function handleLogging(func: Function, functionType: FunctionType, 
   }
 }
 
-export function handleLoggingSync(func: Function, functionType: FunctionType, cell: PrivateCell) {
+export function handleLoggingSync(func: Function, functionType: FunctionType, cell: Cell) {
   try {
     return func();
   }

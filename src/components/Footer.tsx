@@ -2,6 +2,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Console } from "./console/Console";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
 import { useEffect, useRef, useState } from "react";
+import { Separator } from "./ui/separator";
+import { Button } from "./ui/button";
 
 const Footer = () => {
   const [tab, setTab] = useState("sheets");
@@ -33,8 +35,16 @@ const Footer = () => {
         onValueChange={onTabChanged}
         className="">
         {/* all example sheets will be visible here */}
-        <TabsContent value="sheets">
-          Make changes to your account here.
+        <TabsContent value="sheets" className="mb-2">
+          <div className="flex items-center h-5 space-x-1 text-sm">
+            <Button variant="ghost">Data Cleaning</Button>
+            <Separator orientation="vertical" />
+            <Button variant="ghost">Weather API</Button>
+            <Separator orientation="vertical" />
+            <Button variant="ghost">Game of Life</Button>
+            <Separator orientation="vertical" />
+            <Button variant="ghost">Blank</Button>
+          </div>
         </TabsContent>
 
         {/* console will be visible here */}

@@ -10,10 +10,10 @@ import { spreadsheet } from "@/lib/spreadsheet";
 import { CellTypeSelect } from "./CellTypeSelect";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
 import { CellNormalFields } from "./CellNormalFields";
-import { PrivateCellNormal } from "@/lib/cells/cell_normal";
-import { PrivateCellButton } from "@/lib/cells/cell_button";
+import { CellNormal } from "@/lib/cells/cell_normal";
+import { CellButton } from "@/lib/cells/cell_button";
 import { CellButtonFields } from "./CellButtonFields";
-import { PrivateCellTimer } from "@/lib/cells/cell_timer";
+import { CellTimer } from "@/lib/cells/cell_timer";
 import { CellTimerFields } from "./CellTimerFields";
 
 type Props = {
@@ -54,11 +54,11 @@ export const CellEditor = ({ location }: Props) => {
           }}></CellTypeSelect>
 
         {(() => {
-          if (cell instanceof PrivateCellNormal) {
+          if (cell instanceof CellNormal) {
             return <CellNormalFields cell={cell} />;
-          } else if (cell instanceof PrivateCellButton) {
+          } else if (cell instanceof CellButton) {
             return <CellButtonFields cell={cell} />;
-          } else if (cell instanceof PrivateCellTimer) {
+          } else if (cell instanceof CellTimer) {
             return <CellTimerFields cell={cell} />;
           }
         })()}

@@ -1,11 +1,11 @@
 import { CellLabelInput } from "./CellLabelInput";
-import type { PrivateCellTimer } from "@/lib/cells/cell_timer";
+import type { CellTimer } from "@/lib/cells/cell_timer";
 import { CellLoopTimeInput } from "./CellLoopTimeInput";
 import { CellPausedInput } from "./CellPausedInput";
 import { ActionFunction } from "./ActionFunction";
 
 interface Props {
-  cell: PrivateCellTimer;
+  cell: CellTimer;
 }
 
 export function CellTimerFields({ cell }: Props) {

@@ -1,10 +1,10 @@
-import type { PrivateCellNormal } from "@/lib/cells/cell_normal";
+import type { CellNormal } from "@/lib/cells/cell_normal";
 import { Label } from "../ui/label";
 import { Badge } from "../ui/badge";
 import { getLocationDisplayName, getLocationId } from "@/lib/cells/cells_util";
 
 type Props = {
-  cell: PrivateCellNormal;
+  cell: CellNormal;
 };
 
 export const CellDependencies = ({ cell }: Props) => {

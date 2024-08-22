@@ -1,15 +1,15 @@
-import type { CellLocation, PrivateCell } from "@/lib/cells/cell_types";
+import type { CellLocation, Cell } from "@/lib/cells/cell_types";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
 import { getLocationId } from "@/lib/cells/cells_util";
-import { PrivateCellNormal } from "@/lib/cells/cell_normal";
-import { PrivateCellButton } from "@/lib/cells/cell_button";
-import { CellButton } from "../code_panel/CellButton";
-import { PrivateCellTimer } from "@/lib/cells/cell_timer";
-import { CellTimer } from "../code_panel/CellTimer";
+import { CellNormal } from "@/lib/cells/cell_normal";
+import { CellButton } from "@/lib/cells/cell_button";
+import { CellTimer } from "@/lib/cells/cell_timer";
 import { handleLoggingSync } from "@/lib/console";
+import { CellButtonContent } from "../code_panel/CellButtonContent";
+import { CellTimerContent } from "../code_panel/CellTimer";
 
 type Props = {
-  cell: PrivateCell | null;
+  cell: Cell | null;
   location: CellLocation;
 };
 
@@ -20,7 +20,7 @@ export const CellContent = ({ cell, location }: Props) => {
     <span className="overflow-hidden truncate">
       {(() => {
         // normal cells
-        if (cell instanceof PrivateCellNormal) {
+        if (cell instanceof CellNormal) {
           const { format, value } = cell;
 
           // user wrote a formatter
@@ -34,13 +34,13 @@ export const CellContent = ({ cell, location }: Props) => {
         }
 
         // button cells
-        else if (cell instanceof PrivateCellButton) {
-          return <CellButton cell={cell} />;
+        else if (cell instanceof CellButton) {
+          return <CellButtonContent cell={cell} />;
         }
 
         // timer cells
-        else if (cell instanceof PrivateCellTimer) {
-          return <CellTimer cell={cell} />;
+        else if (cell instanceof CellTimer) {
+          return <CellTimerContent cell={cell} />;
         }
       })()}
     </span>

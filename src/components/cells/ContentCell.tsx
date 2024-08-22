@@ -7,7 +7,7 @@ import {
   findCellAtLocation,
   getLocationId,
 } from "@/lib/cells/cells_util";
-import { PrivateCellNormal } from "@/lib/cells/cell_normal";
+import { CellNormal } from "@/lib/cells/cell_normal";
 
 type Props = {
   location: CellLocation;
@@ -32,14 +32,14 @@ export const ContentCell = ({ location }: Props) => {
     : "";
 
   const styleClasses =
-    cell && cell instanceof PrivateCellNormal
+    cell && cell instanceof CellNormal
       ? `${cell.style.bold ? "font-semibold" : ""}
       ${cell.style.italic ? "italic" : ""}
       ${cell.style.underline ? "underline" : ""}
     `
       : "";
 
-  const paddingClass = cell instanceof PrivateCellNormal ? "p-1" : "p-0";
+  const paddingClass = cell instanceof CellNormal ? "p-1" : "p-0";
 
   return (
     <div

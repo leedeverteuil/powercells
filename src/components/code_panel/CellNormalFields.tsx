@@ -1,4 +1,4 @@
-import type { PrivateCellNormal } from "@/lib/cells/cell_normal";
+import type { CellNormal } from "@/lib/cells/cell_normal";
 import { CellValueInput } from "./CellValueInput";
 import { CalculateFunction } from "./CalculateFunction";
 import { CellDependencies } from "./CellDependencies";
@@ -8,7 +8,7 @@ import type { CellStyleProperty } from "@/lib/cells/cell_types";
 import { cellValueToString } from "@/lib/cells/cells_util";
 
 interface Props {
-  cell: PrivateCellNormal;
+  cell: CellNormal;
 }
 
 export function CellNormalFields({ cell }: Props) {

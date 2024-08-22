@@ -1,4 +1,4 @@
-import type { PrivateCellNormal } from "@/lib/cells/cell_normal";
+import type { CellNormal } from "@/lib/cells/cell_normal";
 import { Bold, Italic, Underline } from "lucide-react";
 import { Label } from "../ui/label";
 import type { CellStyleProperty } from "@/lib/cells/cell_types";
@@ -7,7 +7,7 @@ import { getLocationId } from "@/lib/cells/cells_util";
 import { Toggle } from "../ui/toggle";
 
 type Props = {
-  cell: PrivateCellNormal;
+  cell: CellNormal;
   handleToggle: (prop: CellStyleProperty, enabled: boolean) => void;
 };
 

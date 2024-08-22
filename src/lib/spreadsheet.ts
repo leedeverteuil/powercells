@@ -1,5 +1,5 @@
-import { PrivateCellNormal } from "./cells/cell_normal";
-import type { CellLocation, CellType, CellValue, PrivateCell } from "./cells/cell_types";
+import { CellNormal } from "./cells/cell_normal";
+import type { CellLocation, CellType, CellValue, Cell } from "./cells/cell_types";
 import { findCellAtLocation, getConstructorForCellType, getLocationId, parseLocationQuery } from "./cells/cells_util";
 
 // constants
@@ -15,7 +15,7 @@ export type SpreadsheetSubscriberRecord = {
 };
 
 export type DependencyNode = {
-  cell: PrivateCellNormal;
+  cell: CellNormal;
   neighbors: DependencyNode[];
   visited: boolean;
 };
@@ -30,6 +30,11 @@ export type CustomColSizes = {
   [col: number]: number;
 };
 
+// export type SpreadsheetSerialized = {
+//   grid: CellSerialized[][];
+//   customColSizes: CustomColSizes;
+// };
+
 // constants
 export const letters = [
   "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
@@ -37,9 +42,9 @@ export const letters = [
   "u", "v", "w", "x", "y", "z"
 ];
 
-export class PrivateSpreadsheet {
+export class Spreadsheet {
   selectedLocation: CellLocation | null = null;
-  grid: PrivateCell[][] = [];
+  grid: Cell[][] = [];
   subscriberRecords: SpreadsheetSubscriberRecord[] = [];
   customColSizes: CustomColSizes = {};
 
@@ -51,6 +56,15 @@ export class PrivateSpreadsheet {
     // todo
     console.log("destroying spreadsheet");
   }
+
+  // serialize(): SpreadsheetSerialized {
+  //   // convert to serialized cells
+
+
+  //   return {
+
+  //   };
+  // }
 
   /** @returns unsubscribe function */
   subscribe(func: SpreadsheetSubscriber, dependencies: string[]): () => void {
@@ -92,7 +106,7 @@ export class PrivateSpreadsheet {
     }
   }
 
-  getCell(location: CellLocation): PrivateCell {
+  getCell(location: CellLocation): Cell {
     const existingCell = findCellAtLocation(this.grid, location);
 
     if (existingCell) {
@@ -112,7 +126,7 @@ export class PrivateSpreadsheet {
         gridRow = grid[row];
       }
 
-      const newCell = new PrivateCellNormal(location, "");
+      const newCell = new CellNormal(location, "");
       gridRow[col] = newCell;
 
       return newCell;
@@ -127,7 +141,7 @@ export class PrivateSpreadsheet {
     }
   }
 
-  handleCellChangeAsync(changedCell: PrivateCell) {
+  handleCellChangeAsync(changedCell: Cell) {
     this.handleCellChange(changedCell, [])
       .then()
       .catch(err => {
@@ -135,15 +149,15 @@ export class PrivateSpreadsheet {
       });
   }
 
-  async handleCellChange(changedCell: PrivateCell, updateChain: string[] = []) {
+  async handleCellChange(changedCell: Cell, updateChain: string[] = []) {
     this.updateSubscribers([getLocationId(changedCell.location), "grid"]);
 
     // any cells that depend on changed cell should recalculate
-    if (changedCell instanceof PrivateCellNormal) {
+    if (changedCell instanceof CellNormal) {
       for (const row of spreadsheet.grid) {
         if (Array.isArray(row)) {
           for (const cell of row) {
-            if (cell && cell instanceof PrivateCellNormal && cell.dependencies.includes(changedCell)) {
+            if (cell && cell instanceof CellNormal && cell.dependencies.includes(changedCell)) {
               await cell.runCalculate(true, updateChain);
             }
           }
@@ -189,8 +203,8 @@ export class PrivateSpreadsheet {
     this.updateSubscribers(["columnSizes"]);
   }
 
-  runQuery(query: string): PrivateCell[] {
-    const results: PrivateCell[] = [];
+  runQuery(query: string): Cell[] {
+    const results: Cell[] = [];
 
     // is range or not
     if (query.includes(":")) {
@@ -229,14 +243,14 @@ export class PrivateSpreadsheet {
     return results;
   }
 
-  getPublicFunctions(dependentCell?: PrivateCellNormal): PublicFunctions {
+  getPublicFunctions(dependentCell?: CellNormal): PublicFunctions {
     // get one or many
     const get = (query: string) => {
       const results = this.runQuery(query);
 
       // link dependencies (only normal cells)
       if (dependentCell) {
-        dependentCell.addDependency(...results.filter(c => c instanceof PrivateCellNormal));
+        dependentCell.addDependency(...results.filter(c => c instanceof CellNormal));
       }
 
       const len = results.length
@@ -245,11 +259,11 @@ export class PrivateSpreadsheet {
       }
       else if (len === 1) {
         const firstResult = results[0];
-        return firstResult instanceof PrivateCellNormal ? firstResult.value : "";
+        return firstResult instanceof CellNormal ? firstResult.value : "";
       }
       else {
         return results.map(r => {
-          return r instanceof PrivateCellNormal ? r.value : "";
+          return r instanceof CellNormal ? r.value : "";
         });
       }
     };
@@ -258,7 +272,7 @@ export class PrivateSpreadsheet {
     const set = (query: string, value: CellValue) => {
       const results = this.runQuery(query);
       for (const r of results) {
-        if (r instanceof PrivateCellNormal) {
+        if (r instanceof CellNormal) {
           r.setValue(value);
         }
         else {
@@ -272,7 +286,7 @@ export class PrivateSpreadsheet {
     const update = (query: string, handler: (value: CellValue) => CellValue) => {
       const results = this.runQuery(query);
       for (const r of results) {
-        if (r instanceof PrivateCellNormal) {
+        if (r instanceof CellNormal) {
           r.setValue(handler(r.value));
         }
         else {
@@ -298,14 +312,14 @@ export class PrivateSpreadsheet {
     }
   }
 
-  private getAllCells(): PrivateCell[] {
+  private getAllCells(): Cell[] {
     return this.grid.reduce((acc, row) => {
       return [...acc, ...(row ?? [])];
     }, []);
   }
 
-  private getCalculateOrder(): PrivateCellNormal[] {
-    const cells = this.getAllCells().filter(c => c && c instanceof PrivateCellNormal);
+  private getCalculateOrder(): CellNormal[] {
+    const cells = this.getAllCells().filter(c => c && c instanceof CellNormal);
 
     // build nodes with dependents as neighbors
     const nodes: DependencyNode[] = cells.map(c => { return { cell: c, neighbors: [], visited: false } });
@@ -319,7 +333,7 @@ export class PrivateSpreadsheet {
 
     // iterative topological sort
     const stack: DependencyNode[] = nodes.filter(n => n.cell.dependencies.length === 0);
-    const order: PrivateCellNormal[] = [];
+    const order: CellNormal[] = [];
 
     while (stack.length !== 0) {
       const node = stack.pop();
@@ -338,7 +352,4 @@ export class PrivateSpreadsheet {
   }
 }
 
-export const spreadsheet = new PrivateSpreadsheet();
-
-// @ts-ignore
-window.spreadsheet = spreadsheet;
+export const spreadsheet = new Spreadsheet();

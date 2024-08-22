@@ -1,8 +1,8 @@
 import { letters } from "../spreadsheet";
-import { PrivateCellButton } from "./cell_button";
-import { PrivateCellNormal } from "./cell_normal";
-import { PrivateCellTimer } from "./cell_timer";
-import type { CellLocation, CellType, CellValue, PrivateCell } from "./cell_types";
+import { CellButton } from "./cell_button";
+import { CellNormal } from "./cell_normal";
+import { CellTimer } from "./cell_timer";
+import type { CellLocation, CellType, CellValue, Cell } from "./cell_types";
 
 // for converting letters to numbers
 const lettersToNums: { [letter: string]: number } = {
@@ -23,16 +23,16 @@ const numsToLetters: { [num: number]: string } = {
 
 // functions
 export function getConstructorForCellType(type: CellType) {
-  if (type === "normal") return PrivateCellNormal;
-  if (type === "button") return PrivateCellButton;
-  if (type === "timer") return PrivateCellTimer;
+  if (type === "normal") return CellNormal;
+  if (type === "button") return CellButton;
+  if (type === "timer") return CellTimer;
   throw new Error("Invalid cell type");
 }
 
 export function getCellTypeFromConstructor(constructor: Function): CellType {
-  if (constructor === PrivateCellNormal) return "normal";
-  if (constructor === PrivateCellButton) return "button";
-  if (constructor === PrivateCellTimer) return "timer";
+  if (constructor === CellNormal) return "normal";
+  if (constructor === CellButton) return "button";
+  if (constructor === CellTimer) return "timer";
   throw new Error("Invalid constructor (bug)");
 }
 
@@ -133,7 +133,7 @@ export function parseCellLocationFromUserInput(col: string | number, row: number
   };
 }
 
-export function findCellAtLocation(grid: PrivateCell[][], location: CellLocation): (PrivateCell | null) {
+export function findCellAtLocation(grid: Cell[][], location: CellLocation): (Cell | null) {
   const row = grid[location.row];
   if (row) {
     const cell = row[location.col]

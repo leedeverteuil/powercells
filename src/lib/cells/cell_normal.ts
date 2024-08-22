@@ -4,8 +4,11 @@ import { BaseCell } from "./cell_base";
 import { getLocationId } from "./cells_util";
 import { handleLogging } from "../console";
 
-export class PrivateCellNormal extends BaseCell {
-  dependencies: PrivateCellNormal[] = [];
+export type CellNormalSerialized = {
+};
+
+export class CellNormal extends BaseCell {
+  dependencies: CellNormal[] = [];
   value: CellValue;
   format: Function | null = null;
   calculate: Function | null = null;
@@ -24,9 +27,9 @@ export class PrivateCellNormal extends BaseCell {
     spreadsheet.handleCellChangeAsync(this);
   }
 
-  addDependency(...deps: PrivateCellNormal[]) {
+  addDependency(...deps: CellNormal[]) {
     for (const d of deps) {
-      if (!this.dependencies.includes(d) && d instanceof PrivateCellNormal) {
+      if (!this.dependencies.includes(d) && d instanceof CellNormal) {
         this.dependencies.push(d);
       }
     }

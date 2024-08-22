@@ -5,7 +5,7 @@ import { handleLogging } from "../console";
 
 export type CellButtonStyle = "primary" | "secondary" | "destructive";
 
-export class PrivateCellButton extends BaseCell {
+export class CellButton extends BaseCell {
   label = "Click Me";
   buttonStyle: CellButtonStyle = "primary";
   action: Function | null = null;

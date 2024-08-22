@@ -1,11 +1,11 @@
-import type { PrivateCellTimer } from "@/lib/cells/cell_timer";
+import type { CellTimer } from "@/lib/cells/cell_timer";
 import { useEffect, useState } from "react";
 
 type Props = {
-  cell: PrivateCellTimer;
+  cell: CellTimer;
 };
 
-export const CellTimer = ({ cell }: Props) => {
+export const CellTimerContent = ({ cell }: Props) => {
   const [progress, setProgress] = useState(0);
   const percentage = progress * 100;
 
