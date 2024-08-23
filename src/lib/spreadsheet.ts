@@ -339,7 +339,8 @@ export class Spreadsheet {
       MIN_COL_WIDTH
     );
 
-    this.updateSubscribers(["columnSizes"]);
+    this.tainted = true;
+    this.updateSubscribers(["columnSizes", "tainted"]);
   }
 
   runQuery(query: string): Cell[] {
