@@ -182,7 +182,7 @@ export class Spreadsheet {
     }
   }
 
-  static fromStorage(key: string): Spreadsheet {
+  static fromStorage(key: string, reset = false): Spreadsheet {
     let obj: SpreadsheetSerialized | null = null;
     try {
       const item = localStorage.getItem("spreadsheetSaves");
@@ -193,7 +193,7 @@ export class Spreadsheet {
       console.error(err);
     }
 
-    if (!obj) {
+    if (!obj || reset) {
       obj = defaultSheets[key];
     }
 

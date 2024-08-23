@@ -45,6 +45,13 @@ const AppController = () => {
     }
   };
 
+  const handleResetSheet = () => {
+    if (spreadsheet) {
+      const key = spreadsheet.key;
+      setSpreadsheet(Spreadsheet.fromStorage(key, true));
+    }
+  };
+
   return (
     <SpreadsheetContext.Provider value={spreadsheet}>
       <main className="h-screen max-w-full overflow-hidden bg-white dark:bg-zinc-950">
@@ -73,7 +80,7 @@ const AppController = () => {
             <DarkModeToggle />
           </header>
 
-          <Toolbar />
+          <Toolbar handleResetSheet={handleResetSheet} />
           <CellsGrid />
           <Footer
             handleSheetChange={handleSheetChange}

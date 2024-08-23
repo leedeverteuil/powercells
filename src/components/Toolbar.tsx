@@ -4,10 +4,16 @@ import { useState } from "react";
 import { SettingsDialog } from "./SettingsDialog";
 import { useToast } from "./ui/use-toast";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
+import { ResetSheetDialog } from "./ResetSheetDialog";
 
-const Toolbar = () => {
+type Props = {
+  handleResetSheet: () => void;
+};
+
+const Toolbar = ({ handleResetSheet }: Props) => {
   const [isRecalculating, setIsRecalculating] = useState(false);
   const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
+  const [resetSheetDialogOpen, setResetSheetDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const { spreadsheet } = useRenderSubscriber(["tainted"]);
@@ -42,11 +48,6 @@ const Toolbar = () => {
             <Play className="w-4 h-4 mr-2" /> Recalculate All
           </Button>
 
-          {/* reset sheet */}
-          <Button variant="secondary">
-            <RefreshCcw className="w-4 h-4 mr-2" /> Reset
-          </Button>
-
           {/* save sheet */}
           <Button
             disabled={!spreadsheet.tainted}
@@ -57,6 +58,13 @@ const Toolbar = () => {
         </div>
 
         <div className="flex items-center justify-start gap-2">
+          {/* reset sheet */}
+          <Button
+            onClick={() => setResetSheetDialogOpen(true)}
+            variant="secondary">
+            <RefreshCcw className="w-4 h-4 mr-2" /> Reset Sheet
+          </Button>
+
           {/* open docs */}
           <Button variant="secondary">
             <BookText className="w-4 h-4 mr-2" /> Show Docs
@@ -74,6 +82,11 @@ const Toolbar = () => {
       <SettingsDialog
         open={settingsDialogOpen}
         onClose={() => setSettingsDialogOpen(false)}></SettingsDialog>
+
+      <ResetSheetDialog
+        open={resetSheetDialogOpen}
+        onClose={() => setResetSheetDialogOpen(false)}
+        handleConfirm={handleResetSheet}></ResetSheetDialog>
     </>
   );
 };
