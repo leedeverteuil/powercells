@@ -4,12 +4,12 @@ import { CellNormal } from "./cells/cell_normal";
 import { CellTimer } from "./cells/cell_timer";
 import type { CellLocation, CellType, CellValue, Cell, CellSerialized } from "./cells/cell_types";
 import { findCellAtLocation, getConstructorForCellType, getLocationId, parseLocationQuery } from "./cells/cells_util";
-import { defaultSheets } from "./spreadsheet_defaults";
+import { defaultSheets } from "./spreadsheet_defaults/spreadsheet_defaults";
 
 // constants
 const DEFAULT_COL_WIDTH = 120;
 const MIN_COL_WIDTH = 60;
-const MAX_COL_WIDTH = 300;
+const MAX_COL_WIDTH = 700;
 
 // types
 export type SpreadsheetSubscriber = (ts: number) => void;

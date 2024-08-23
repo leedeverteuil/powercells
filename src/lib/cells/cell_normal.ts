@@ -80,13 +80,11 @@ export class CellNormal extends BaseCell {
 
   setCalculateFunction(func: Function | null) {
     this.calculate = func;
-    if (func) {
-      this.runCalculate()
-    }
-    else {
+    if (!func) {
       this.dependencies = [];
-      this.callHandleCellChangeAsync();
     }
+
+    this.callHandleCellChangeAsync();
   }
 
   setFormatFunction(func: Function | null) {

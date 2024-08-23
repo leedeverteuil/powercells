@@ -51,7 +51,7 @@ export function buildActionFunction(funcStr: string): Function {
 }
 
 export function cleanCodeForInnerHTML(code: string) {
-  code = code.replace(ampRegex, "&").replace(leftBracketRegex, "<").replace(rightBracketRegex, ">");
+  code = code.replace(ampRegex, "&amp;").replace(leftBracketRegex, "&lt;").replace(rightBracketRegex, "&gt;");
 
   // last char newlines replace with space at end so it gets rendered
   if (code[code.length - 1] == "\n") {

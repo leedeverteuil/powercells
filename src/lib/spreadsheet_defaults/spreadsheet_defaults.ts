@@ -1,11 +1,8 @@
-import type { SpreadsheetSerialized } from "./spreadsheet";
+import type { SpreadsheetSerialized } from "../spreadsheet";
+import { compoundInterest } from "./compound_interest";
 
 export const defaultSheets: { [key: string]: SpreadsheetSerialized } = {
-  "dataCleaning": {
-    key: "dataCleaning",
-    grid: [],
-    customColSizes: [],
-  },
+  "compoundInterest": compoundInterest,
   "weatherApi": {
     key: "weatherApi",
     grid: [],
@@ -22,3 +19,5 @@ export const defaultSheets: { [key: string]: SpreadsheetSerialized } = {
     customColSizes: [],
   }
 };
+
+

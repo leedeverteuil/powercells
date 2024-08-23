@@ -17,7 +17,7 @@ const AppController = () => {
 
   // start with data cleaning
   useEffect(() => {
-    const initialSheet = Spreadsheet.fromStorage("dataCleaning");
+    const initialSheet = Spreadsheet.fromStorage("compoundInterest");
     setSpreadsheet(initialSheet);
   }, []);
 

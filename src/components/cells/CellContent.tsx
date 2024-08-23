@@ -26,7 +26,7 @@ export const CellContent = ({ cell, location }: Props) => {
           // user wrote a formatter
           if (format) {
             return (
-              <>{handleLoggingSync(format, "format", cell)}</>
+              <>{handleLoggingSync(() => format(value), "format", cell)}</>
             );
           }
           // no formatter provided
