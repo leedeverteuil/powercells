@@ -57,13 +57,19 @@ export class Spreadsheet {
   subscriberRecords: SpreadsheetSubscriberRecord[] = [];
   customColSizes: CustomColSizes = {};
   tainted: boolean = false;
+  initDone: boolean = false;
 
   constructor(key: string) {
     this.key = key;
   }
 
   init() {
-    this.recalculate().then().catch(console.error);
+    this.recalculate()
+      .then()
+      .catch(console.error)
+      .finally(() => {
+        this.initDone = true;
+      });
   }
 
   serialize(): SpreadsheetSerialized {
@@ -219,6 +225,8 @@ export class Spreadsheet {
   }
 
   async recalculate() {
+    console.log("recalculating");
+
     // run all in order
     for (const cell of this.getCalculateOrder()) {
       await cell.runCalculate(false);
@@ -227,8 +235,6 @@ export class Spreadsheet {
   }
 
   handleCellChangeAsync(changedCell: Cell) {
-    this.tainted = true;
-
     this.handleCellChange(changedCell, [])
       .then()
       .catch(err => {
@@ -237,7 +243,9 @@ export class Spreadsheet {
   }
 
   async handleCellChange(changedCell: Cell, updateChain: string[] = []) {
-    this.tainted = true;
+    if (this.initDone) {
+      this.tainted = true;
+    }
 
     this.updateSubscribers([getLocationId(changedCell.location), "grid", "tainted"]);
 
