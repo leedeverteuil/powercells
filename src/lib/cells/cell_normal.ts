@@ -36,6 +36,8 @@ export class CellNormal extends BaseCell {
     this.style = style;
   }
 
+  destroy() { }
+
   serialize(): CellNormalSerialized {
     return {
       type: "normal",
@@ -95,6 +97,14 @@ export class CellNormal extends BaseCell {
   setStyleProp(prop: CellStyleProperty, enabled: boolean) {
     this.style[prop] = enabled;
     this.callHandleCellChangeAsync();
+  }
+
+  isDefault() {
+    if (this.value !== "") return false;
+    if (this.format !== null) return false;
+    if (this.calculate !== null) return false;
+    if (this.style.bold || this.style.italic || this.style.underline) return false;
+    return true;
   }
 
   async runCalculate(updateDependents: boolean = true, updateChain: string[] = []) {

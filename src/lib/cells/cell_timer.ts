@@ -37,7 +37,13 @@ export class CellTimer extends BaseCell {
     this.loopTimeMs = loopTimeMs;
     this.lastRunMs = lastRunMs;
     this.action = action;
-    this.setPaused(paused);
+    this.initPausedAsync(paused).then().catch(console.error)
+  }
+
+  destroy() {
+    if (this.unbindFunc) {
+      this.unbindFunc();
+    }
   }
 
   serialize(): CellTimerSerialized {
@@ -76,6 +82,10 @@ export class CellTimer extends BaseCell {
 
     // rebind interval if running
     this.setPaused(this.paused);
+  }
+
+  async initPausedAsync(paused: boolean) {
+    this.setPaused(paused);
   }
 
   setPaused(paused: boolean) {

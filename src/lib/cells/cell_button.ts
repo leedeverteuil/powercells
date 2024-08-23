@@ -32,6 +32,8 @@ export class CellButton extends BaseCell {
     this.action = action;
   }
 
+  destroy() { }
+
   serialize(): CellButtonSerialized {
     return {
       type: "button",

@@ -24,6 +24,9 @@ const AppController = () => {
   // init and destroy
   useEffect(() => {
     spreadsheet?.init();
+    return () => {
+      spreadsheet?.destroy();
+    };
   }, [spreadsheet]);
 
   const handleSheetChange = (sheetKey: string) => {

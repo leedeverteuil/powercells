@@ -63,6 +63,19 @@ export class Spreadsheet {
     this.key = key;
   }
 
+  destroy() {
+    // cleanup cell functionality
+    for (const row of this.grid) {
+      if (row) {
+        for (const cell of row) {
+          if (cell) {
+            cell.destroy();
+          }
+        }
+      }
+    }
+  }
+
   init() {
     this.recalculate()
       .then()
@@ -74,11 +87,45 @@ export class Spreadsheet {
 
   serialize(): SpreadsheetSerialized {
     // convert to serialized cells
-    const convertedGrid = this.grid.map(row => {
+    let convertedGrid = this.grid.map(row => {
       return row ? row.map(cell => {
-        return cell ? cell.serialize() : null;
+        if (!cell) return null;
+        if (cell instanceof CellNormal && cell.isDefault()) return null;
+        return cell.serialize();
       }) : null;
     });
+
+    // replace rows that are just full of nulls
+    convertedGrid = convertedGrid.map(row => {
+      // already null
+      if (row === null) return null;
+
+      let allNulls = true;
+      for (const cell of row) {
+        if (cell !== null) allNulls = false;
+      }
+
+      if (!allNulls) {
+        // work backwards in row and remove tails of null cells
+        for (let i = row.length - 1; i >= 0; i--) {
+          const cell = row[i];
+          if (cell === null) row.pop()
+          else break
+        }
+
+        return row;
+      }
+      else {
+        return null;
+      }
+    });
+
+    // work backwards through all rows and remove tails of null rows
+    for (let r = convertedGrid.length - 1; r >= 0; r--) {
+      const row = convertedGrid[r];
+      if (row === null) convertedGrid.pop();
+      else break;
+    }
 
     return {
       key: this.key,
