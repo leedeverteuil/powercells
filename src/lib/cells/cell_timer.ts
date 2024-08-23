@@ -2,7 +2,7 @@ import type { CellLocation } from "./cell_types";
 import { BaseCell } from "./cell_base";
 import { handleLogging } from "../console";
 import { buildActionFunction, getFunctionBody } from "../code_editor";
-import { Spreadsheet, SpreadsheetContext } from "../spreadsheet";
+import { Spreadsheet } from "../spreadsheet";
 
 export type CellTimerSerialized = {
   type: "timer";
@@ -13,7 +13,7 @@ export type CellTimerSerialized = {
   action: string | null;
 };
 
-const MIN_LOOP_TIME_MS = 500;
+const MIN_LOOP_TIME_MS = 100;
 
 export class CellTimer extends BaseCell {
   label: string;

@@ -31,7 +31,7 @@ export type PublicFunctions = {
 };
 
 export type CustomColSizes = {
-  [col: number]: number;
+  [col: number]: number | null;
 };
 
 export type SpreadsheetSerialized = {
@@ -88,9 +88,6 @@ export class Spreadsheet {
   }
 
   static fromSerialized(serialized: SpreadsheetSerialized): Spreadsheet {
-    console.log(serialized);
-
-
     const { grid, customColSizes, key } = serialized;
     const spreadsheet = new Spreadsheet(key);
 
@@ -225,8 +222,6 @@ export class Spreadsheet {
   }
 
   async recalculate() {
-    console.log("recalculating");
-
     // run all in order
     for (const cell of this.getCalculateOrder()) {
       await cell.runCalculate(false);

@@ -57,11 +57,11 @@ export const CodeTextArea = ({ id, value, onInput }: Props) => {
         spellCheck={false}
         onKeyDown={onKeyDown}
         className={`${sharedStyle} font-mono font-medium tracking-tight text-transparent bg-transparent
-                  caret-zinc-50 z-[5] focus:outline-none resize-none`}></textarea>
+                  caret-zinc-50 z-[5] focus:outline-none resize-none break-all`}></textarea>
       <pre className={`${sharedStyle} z-[4]`} aria-hidden="true">
         <code
           ref={codeRef}
-          className="block w-full overflow-auto font-mono font-medium tracking-tight whitespace-pre-wrap javascript"></code>
+          className="block w-full overflow-auto font-mono font-medium tracking-tight break-all whitespace-pre-wrap javascript"></code>
       </pre>
     </div>
   );
