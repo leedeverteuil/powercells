@@ -50,10 +50,8 @@ export const CellEditor = ({ location }: Props) => {
         {/* cell type editor */}
         <CellTypeSelect
           value={cellType}
-          onValueChange={(value) => {
-            if (value) {
-              spreadsheet.setCellType(location, value as CellType);
-            }
+          handleValueChange={(value) => {
+            spreadsheet.setCellType(location, value as CellType);
           }}></CellTypeSelect>
 
         {(() => {
