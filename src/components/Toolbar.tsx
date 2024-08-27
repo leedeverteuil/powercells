@@ -1,4 +1,4 @@
-import { BookText, Play, RefreshCcw, Save, Settings } from "lucide-react";
+import { Play, RefreshCcw, Save, Settings } from "lucide-react";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { SettingsDialog } from "./SettingsDialog";
@@ -63,11 +63,6 @@ const Toolbar = ({ handleResetSheet }: Props) => {
             onClick={() => setResetSheetDialogOpen(true)}
             variant="secondary">
             <RefreshCcw className="w-4 h-4 mr-2" /> Reset Sheet
-          </Button>
-
-          {/* open docs */}
-          <Button variant="secondary">
-            <BookText className="w-4 h-4 mr-2" /> Show Docs
           </Button>
 
           {/* open settings */}

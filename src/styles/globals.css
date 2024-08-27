@@ -139,3 +139,8 @@
 .hljs-strong {
   @apply font-semibold;
 }
+
+/* docs */
+.code-inline {
+  @apply font-mono text-sm dark:bg-zinc-900 bg-zinc-100 px-2 py-0.5 rounded-sm
+}

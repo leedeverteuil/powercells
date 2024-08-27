@@ -42,6 +42,11 @@ const Footer = ({ handleSheetChange, sheetKey }: Props) => {
         <TabsContent value="sheets" className="mb-2">
           <div className="flex items-center h-5 space-x-1 text-sm">
             <Button
+              onClick={() => handleSheetChange("docs")}
+              variant={sheetKey === "docs" ? "secondary" : "ghost"}>
+              Docs
+            </Button>
+            <Button
               onClick={() => handleSheetChange("compoundInterest")}
               variant={sheetKey === "compoundInterest" ? "secondary" : "ghost"}>
               Compound Interest
