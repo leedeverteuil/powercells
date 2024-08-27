@@ -9,6 +9,7 @@ import { Button } from "../ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { DeleteFunctionDialog } from "./DeleteFunctionDialog";
 import type { CellTimer } from "@/lib/cells/cell_timer";
+import { handleLoggingSync } from "@/lib/console";
 
 type Props = {
   cell: CellButton | CellTimer;
@@ -47,8 +48,19 @@ export const ActionFunction = ({ cell }: Props) => {
   };
 
   const saveChanges = () => {
+    // catch errors and log
+    const func = handleLoggingSync(
+      () => {
+        return buildActionFunction(inputFuncStr);
+      },
+      "saveAction",
+      cell
+    );
+
     // save to cell
-    cell.setActionFunction(buildActionFunction(inputFuncStr));
+    if (func) {
+      cell.setActionFunction(func);
+    }
   };
 
   const openDeleteDialog = () => {

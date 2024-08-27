@@ -1,5 +1,5 @@
 import { getLocationDisplayName } from "@/lib/cells/cells_util";
-import { clearConsole, log } from "@/lib/console";
+import { clearConsole, log, type LogError } from "@/lib/console";
 import { useRenderSubscriber } from "@/lib/render_subscriber";
 import { Eraser } from "lucide-react";
 import { Button } from "../ui/button";
@@ -9,6 +9,25 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+
+function formatErrorMessage(entry: LogError) {
+  const { error, functionType } = entry;
+
+  let verb = "running";
+  let funcName: string = functionType;
+
+  if (functionType.startsWith("save")) {
+    verb = "saving";
+    funcName = functionType.slice(4).toLowerCase();
+  }
+
+  return (
+    <p>
+      Error when {verb} <span className="font-semibold">{funcName}</span>:{" "}
+      {error.message}
+    </p>
+  );
+}
 
 export const Console = () => {
   const { spreadsheet } = useRenderSubscriber(["console"]);
@@ -46,12 +65,7 @@ export const Console = () => {
             <p className="p-1 border border-red-500 w-fit min-w-[2rem] text-center rounded-sm">
               {locName}
             </p>
-
-            <p>
-              Error when running{" "}
-              <span className="font-semibold">{entry.functionType}</span>:{" "}
-              {entry.error.message}
-            </p>
+            {formatErrorMessage(entry)}
           </div>
         );
       })}

@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { CodeTextArea } from "./CodeTextArea";
 import { buildCalculateFunction, getFunctionBody } from "@/lib/code_editor";
 import { DeleteFunctionDialog } from "./DeleteFunctionDialog";
+import { handleLoggingSync } from "@/lib/console";
 
 type Props = {
   cell: CellNormal;
@@ -46,8 +47,19 @@ export const CalculateFunction = ({ cell }: Props) => {
   };
 
   const saveChanges = () => {
+    // catch errors and log
+    const func = handleLoggingSync(
+      () => {
+        return buildCalculateFunction(inputFuncStr);
+      },
+      "saveCalculate",
+      cell
+    );
+
     // save to cell
-    cell.setCalculateFunction(buildCalculateFunction(inputFuncStr));
+    if (func) {
+      cell.setCalculateFunction(func);
+    }
   };
 
   const handleRun = () => {

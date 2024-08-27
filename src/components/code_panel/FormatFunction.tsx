@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { CodeTextArea } from "./CodeTextArea";
 import { buildFormatFunction, getFunctionBody } from "@/lib/code_editor";
 import { DeleteFunctionDialog } from "./DeleteFunctionDialog";
+import { handleLoggingSync } from "@/lib/console";
 
 type Props = {
   cell: CellNormal;
@@ -46,7 +47,19 @@ export const FormatFunction = ({ cell }: Props) => {
   };
 
   const saveChanges = () => {
-    cell.setFormatFunction(buildFormatFunction(inputFuncStr));
+    // catch errors and log
+    const func = handleLoggingSync(
+      () => {
+        return buildFormatFunction(inputFuncStr);
+      },
+      "saveFormat",
+      cell
+    );
+
+    // save to cell
+    if (func) {
+      cell.setFormatFunction(func);
+    }
   };
 
   const openDeleteDialog = () => {
